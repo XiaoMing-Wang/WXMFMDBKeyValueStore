@@ -31,26 +31,38 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)dropTable:(NSString *)tableName;
 - (void)close;
 
-/************************ Put&Get methods<model> *****************************************/
+/********************************* NSObject ***********************************************/
 
 /** 存储model */
 - (void)saveModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey;
 - (id)getModelWithPrimaryKey:(NSString *)primaryKey;
 
 
+/***************** NSArray NSDictionary NSString NSNumber ********************************/
+
 /** 存储NSArray NSDictionary NSString NSNumber */
 - (void)saveAssembleWithAssemble:(id<NSCoding,NSObject,NSMutableCopying>)object
                       primaryKey:(NSString *)primaryKey
                        fromTable:(NSString *)tableName;
 
-- (id<NSCoding>)getAssembleWithPrimaryKey:(NSString *)primaryKey;
+- (id<NSCoding,NSObject,NSMutableCopying>)getAssembleWithPrimaryKey:(NSString *)primaryKey;
+- (WXMKeyValueItem *)getWXMKeyValueItem:(NSString *)primaryKey fromTable:(NSString *)tableName;
+
+/** 删除 */
+- (void)deleteObject:(NSString *)primaryKey fromTable:(NSString *)tableName;
+- (void)deleteObjects:(NSArray *)primaryKeyArray fromTable:(NSString *)tableName;
+- (void)deleteObjectsByIdPrefix:(NSString *)objectIdPrefix fromTable:(NSString *)tableName;
+
+/** 获取所有的item */
+- (NSArray <WXMKeyValueItem *>*)getAllItemsFromTable:(NSString *)tableName;
+- (NSUInteger)getCountFromTable:(NSString *)tableName;
 
 /************************ Put&Get methods<封装对象> *****************************************/
 
 
 /** 把json封装成对象存储 */
 /** 获取对象 */
-- (WXMKeyValueItem *)getWXMKeyValueItemById:(NSString *)objectId fromTable:(NSString *)tableName;
+//- (WXMKeyValueItem *)getWXMKeyValueItemById:(NSString *)objectId fromTable:(NSString *)tableName;
 
 ///** 获取对象 NSDictionary NSArray */
 //- (void)putObject:(id)object withId:(NSString *)objectId intoTable:(NSString *)tableName;
@@ -64,14 +76,6 @@ NS_ASSUME_NONNULL_BEGIN
 //- (void)putNumber:(NSNumber *)number withId:(NSString *)numberId intoTable:(NSString *)tableName;
 //- (NSNumber *)getNumberById:(NSString *)numberId fromTable:(NSString *)tableName;
 
-/** 获取所有的item */
-- (NSArray *)getAllItemsFromTable:(NSString *)tableName;
-- (NSUInteger)getCountFromTable:(NSString *)tableName;
-
-/** 删除 */
-- (void)deleteObjectById:(NSString *)objectId fromTable:(NSString *)tableName;
-- (void)deleteObjectsByIdArray:(NSArray *)objectIdArray fromTable:(NSString *)tableName;
-- (void)deleteObjectsByIdPrefix:(NSString *)objectIdPrefix fromTable:(NSString *)tableName;
 
 @end
 

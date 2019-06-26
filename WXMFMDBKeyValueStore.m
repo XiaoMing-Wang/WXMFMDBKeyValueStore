@@ -90,7 +90,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     return [self initDBWithName:DEFAULT_DB_NAME];
 }
 
-/************************ Put&Get methods<model> *****************************************/
+/********************************* NSObject ***********************************************/
 
 /** 存储 model */
 - (void)saveModelWithObject:(id)object primaryKey:(NSString *)primaryKey {
@@ -102,6 +102,14 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     
     
 }
+
+/** 获取 model */
+- (id)getModelWithPrimaryKey:(NSString *)primaryKey {
+    return nil;
+}
+
+
+/***************** NSArray NSDictionary NSString NSNumber ********************************/
 
 /** 存储NSArray NSDictionary NSString */
 - (void)saveAssembleWithAssemble:(id<NSCoding,NSObject,NSMutableCopying>)object
@@ -121,12 +129,10 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     }
 }
 
-
-
-/** 获取 model */
-- (id)getModelWithPrimaryKey:(NSString *)primaryKey {
+- (id<NSCoding,NSObject,NSMutableCopying>)getAssembleWithPrimaryKey:(NSString *)primaryKey {
     return nil;
 }
+
 
 
 
@@ -226,8 +232,6 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     }
 }
 
-
-
 /************************ Put&Get methods<封装对象> *****************************************/
 
 - (void)putObject:(id)object withId:(NSString *)objectId intoTable:(NSString *)tableName {
@@ -253,7 +257,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (id)getObjectById:(NSString *)objectId fromTable:(NSString *)tableName {
-    WXMKeyValueItem * item = [self getWXMKeyValueItemById:objectId fromTable:tableName];
+    WXMKeyValueItem * item = [self getWXMKeyValueItem:objectId fromTable:tableName];
     if (item) {
         return item.itemObject;
     } else {
@@ -261,7 +265,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     }
 }
 
-- (WXMKeyValueItem *)getWXMKeyValueItemById:(NSString *)objectId fromTable:(NSString *)tableName {
+- (WXMKeyValueItem *)getWXMKeyValueItem:(NSString *)primaryKey fromTable:(NSString *)tableName {
     if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
         return nil;
     }
@@ -269,7 +273,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     __block NSString * json = nil;
     __block NSDate * createdTime = nil;
     [_dbQueue inDatabase:^(FMDatabase *db) {
-        FMResultSet * rs = [db executeQuery:sql, objectId];
+        FMResultSet * rs = [db executeQuery:sql, primaryKey];
         if ([rs next]) {
             json = [rs stringForColumn:@"json"];
             createdTime = [rs dateForColumn:@"createdTime"];
@@ -284,7 +288,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
             return nil;
         }
         WXMKeyValueItem * item = [[WXMKeyValueItem alloc] init];
-        item.itemId = objectId;
+        item.itemId = primaryKey;
         item.itemObject = result;
         item.createdTime = createdTime;
         return item;
@@ -346,8 +350,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     NSError * error;
     for (WXMKeyValueItem * item in result) {
         error = nil;
-        id object = [NSJSONSerialization JSONObjectWithData:[item.itemObject dataUsingEncoding:NSUTF8StringEncoding]
-                                                    options:(NSJSONReadingAllowFragments) error:&error];
+        id object = [NSJSONSerialization JSONObjectWithData:[item.itemObject dataUsingEncoding:NSUTF8StringEncoding] options:(NSJSONReadingAllowFragments) error:&error];
         if (error) {
             debugLog(@"ERROR, faild to prase to json.");
         } else {
@@ -374,26 +377,26 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     return num;
 }
 
-- (void)deleteObjectById:(NSString *)objectId fromTable:(NSString *)tableName {
+- (void)deleteObject:(NSString *)primaryKey fromTable:(NSString *)tableName {
     if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
         return;
     }
     NSString * sql = [NSString stringWithFormat:DELETE_ITEM_SQL, tableName];
     __block BOOL result;
     [_dbQueue inDatabase:^(FMDatabase *db) {
-        result = [db executeUpdate:sql, objectId];
+        result = [db executeUpdate:sql, primaryKey];
     }];
     if (!result) {
         debugLog(@"ERROR, failed to delete item from table: %@", tableName);
     }
 }
 
-- (void)deleteObjectsByIdArray:(NSArray *)objectIdArray fromTable:(NSString *)tableName {
+- (void)deleteObjects:(NSArray *)primaryKeyArray fromTable:(NSString *)tableName {
     if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
         return;
     }
     NSMutableString *stringBuilder = [NSMutableString string];
-    for (id objectId in objectIdArray) {
+    for (id objectId in primaryKeyArray) {
         NSString *item = [NSString stringWithFormat:@" '%@' ", objectId];
         if (stringBuilder.length == 0) {
             [stringBuilder appendString:item];
