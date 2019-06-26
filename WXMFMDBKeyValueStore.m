@@ -93,7 +93,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 /********************************* NSObject ***********************************************/
 
 /** 存储 model */
-- (void)saveModelWithObject:(id)object primaryKey:(NSString *)primaryKey {
+- (void)saveCustomModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey {
     NSString * className = NSStringFromClass([object class]);
     NSString * tableWithName = [NSString stringWithFormat:@"%@_models",className];
     [self createTableWithName:tableWithName];
@@ -104,7 +104,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 /** 获取 model */
-- (id)getModelWithPrimaryKey:(NSString *)primaryKey {
+- (id)getCustomModelWithClass:(Class)aClass primaryKey:(NSString *)primaryKey {
     return nil;
 }
 
@@ -125,7 +125,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
         NSNumber *aNumber = (NSNumber *) object;
         [self putNumber:aNumber withId:primaryKey intoTable:tableName];
     } else if ([object isKindOfClass:[NSObject class]]) {
-        [self saveModelWithObject:object primaryKey:primaryKey];
+        [self saveCustomModelWithObject:object primaryKey:primaryKey];
     }
 }
 

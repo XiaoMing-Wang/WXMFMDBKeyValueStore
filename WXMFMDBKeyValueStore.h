@@ -34,8 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 /********************************* NSObject ***********************************************/
 
 /** 存储model */
-- (void)saveModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey;
-- (id)getModelWithPrimaryKey:(NSString *)primaryKey;
+- (void)saveCustomModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey;
+- (id)getCustomModelWithClass:(Class)aClass primaryKey:(NSString *)primaryKey;
 
 
 /***************** NSArray NSDictionary NSString NSNumber ********************************/
