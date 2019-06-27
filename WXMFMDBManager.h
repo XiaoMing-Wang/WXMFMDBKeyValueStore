@@ -10,9 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WXMFMDBManager : WXMFMDBWrapKeyValueStore
 typedef NS_ENUM(NSInteger, WXMFMDBInstanceType) {
-
     /** 使用ClassName */
     WXMFMDBInstanceTypeUseClassName = 0,
     
@@ -34,6 +32,8 @@ static inline NSString *WXMFMDBTypeConversion(WXMFMDBInstanceType type) {
     return nil;
 }
 
+@interface WXMFMDBManager : WXMFMDBWrapKeyValueStore
+
 /** WXMFMDBInstanceTypeUseClassName */
 /** 父类的方法 */
 + (void)saveCustomModelWithObject:(id)object;
@@ -43,8 +43,5 @@ static inline NSString *WXMFMDBTypeConversion(WXMFMDBInstanceType type) {
 + (void)saveAssembleWithObject:(id)object instanceType:(WXMFMDBInstanceType)instanceType;
 + (id)getAssembleWithInstanceType:(WXMFMDBInstanceType)instanceType;
 @end
-
-
-
 
 NS_ASSUME_NONNULL_END
