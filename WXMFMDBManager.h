@@ -34,8 +34,10 @@ static inline NSString *WXMFMDBTypeConversion(WXMFMDBInstanceType type) {
 
 @interface WXMFMDBManager : WXMFMDBWrapKeyValueStore
 
-/** WXMFMDBInstanceTypeUseClassName */
-/** 父类的方法 */
+/** 需要调用改方法设置userID 数据库所有的表都使用userid作为key
+ + (void)setUserID:(NSString *)userID; */
+
+/** 父类的方法 type为 WXMFMDBInstanceTypeUseClassName */
 + (void)saveCustomModelWithObject:(id)object;
 + (id)getCustomModelWithClass:(Class)aClass;
 
