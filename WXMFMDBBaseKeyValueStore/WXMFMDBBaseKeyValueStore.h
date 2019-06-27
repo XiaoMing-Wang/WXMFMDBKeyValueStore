@@ -17,9 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSDate *createdTime;
 @end
 
-@interface WXMFMDBKeyValueStore : NSObject
-
-+ (instancetype)sharedInstance;
+@interface WXMFMDBBaseKeyValueStore : NSObject
 
 /************************ 数据库操作 *****************************************/
 
@@ -39,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)saveAssembleWithAssemble:(id<NSCopying,NSMutableCopying>)object
                       primaryKey:(NSString *)primaryKey
                        fromTable:(NSString *)tableName;
+
 - (id)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName;
 
 /** 获取 */

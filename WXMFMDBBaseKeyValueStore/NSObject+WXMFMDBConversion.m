@@ -15,8 +15,12 @@
 - (NSString *)wxm_isExistKey:(NSString *)key {
     
     /** 有映射 */
-    if([self respondsToSelector:@selector(wxm_modelMapPropertyNames)]){
-        NSDictionary *map = [self wxm_modelMapPropertyNames];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    SEL sel = NSSelectorFromString(@"wxm_modelMapPropertyNames");
+    if([self respondsToSelector:sel]){
+        NSDictionary *map = [self performSelector:sel];
+#pragma clang diagnostic pop
         __block NSString *newKey = nil;
         [map enumerateKeysAndObjectsUsingBlock:^(NSString* dkey, NSString* obj, BOOL *stop) {
             if([key isEqualToString:dkey]) newKey = obj;
@@ -84,6 +88,7 @@
     /**  NSArray NSData NSString等 以及自定义类 */
     if(objRange.location != NSNotFound) {
         dotRange = [aAttribute rangeOfString:@","];
+        if (dotRange.location - 4 > 10000 || dotRange.location - 4 <= 0) return nil;
         aClassStr = [aAttribute substringWithRange:NSMakeRange(3, dotRange.location - 4)];
         aClass = NSClassFromString(aClassStr);
     } else {

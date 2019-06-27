@@ -19,27 +19,18 @@
 NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject
 #define PATH_OF_DOCUMENT [KLibraryboxPath stringByAppendingPathComponent:@"USER_DATA_CACHE"]
 
-#import "WXMFMDBKeyValueStore.h"
+#import "WXMFMDBBaseKeyValueStore.h"
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 #import "FMDatabaseQueue.h"
 #import "NSObject+WXMFMDBConversion.h"
 
-@implementation WXMKeyValueItem
-
-- (NSString *)description {
-    return [NSString stringWithFormat:@"id=%@, value=%@, timeStamp=%@",
-            _itemId,
-            _itemObject,
-            _createdTime];
-}
-@end
-
-@interface WXMFMDBKeyValueStore()
+@implementation WXMKeyValueItem @end
+@interface WXMFMDBBaseKeyValueStore()
 @property (strong, nonatomic) FMDatabaseQueue * dbQueue;
 @end
 
-@implementation WXMFMDBKeyValueStore
+@implementation WXMFMDBBaseKeyValueStore
 static NSString *const DEFAULT_DB_NAME = @"userdatabase.sqlite";
 
 static NSString *const CREATE_TABLE_SQL =
@@ -47,10 +38,10 @@ static NSString *const CREATE_TABLE_SQL =
 id TEXT NOT NULL, \
 json TEXT NOT NULL, \
 createdTime TEXT NOT NULL, \
-PRIMARY KEY(id)) \
-";
+PRIMARY KEY(id)) ";
 
-static NSString *const UPDATE_ITEM_SQL = @"REPLACE INTO %@ (id, json, createdTime) values (?, ?, ?)";
+static NSString *const UPDATE_ITEM_SQL =
+@"REPLACE INTO %@ (id, json, createdTime) values (?, ?, ?)";
 
 static NSString *const QUERY_ITEM_SQL = @"SELECT json, createdTime from %@ where id = ? Limit 1";
 
@@ -78,27 +69,13 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     }
 }
 
-+ (instancetype)sharedInstance {
-    static WXMFMDBKeyValueStore * instance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        instance = [[self alloc] init];
-    });
-    return instance;
-}
-
 - (id)init {
     return [self initDBWithName:DEFAULT_DB_NAME];
 }
 
 /** 存储 model */
 - (void)saveCustomModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey {
-    NSString * className = NSStringFromClass([object class]);
-    NSString * tableWithName = [NSString stringWithFormat:@"%@_models",className];
-    if ([WXMFMDBKeyValueStore checkTableName:tableWithName] == NO) {
-        return;
-    }
-    
+    NSString * tableWithName = NSStringFromClass([object class]);
     NSDictionary *dictionary = [object wxm_modelToKeyValue];
     [self saveAssembleWithAssemble:dictionary primaryKey:primaryKey fromTable:tableWithName];
 }
@@ -106,13 +83,10 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 /** 获取 model */
 - (id)getCustomModelWithClass:(Class)aClass primaryKey:(NSString *)primaryKey {
     NSString * className = NSStringFromClass(aClass);
-    NSString * tableWithName = [NSString stringWithFormat:@"%@_models",className];
-    WXMKeyValueItem * item = [self getWXMKeyValueItem:primaryKey fromTable:tableWithName];
-    if ([item.itemObject isKindOfClass:[NSDictionary class]]) {
-        id obj = [aClass wxm_modelWithKeyValue:item.itemObject];
-        return obj;
+    id dictionary = [self getAssembleWithPrimaryKey:primaryKey fromTable:className];
+    if ([dictionary isKindOfClass:[NSDictionary class]]) {
+        return [aClass wxm_modelWithKeyValue:dictionary];
     }
-    
     return nil;
 }
 
@@ -120,7 +94,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 - (void)saveAssembleWithAssemble:(id<NSCoding,NSObject,NSMutableCopying>)object
                       primaryKey:(NSString *)primaryKey
                        fromTable:(NSString *)tableName {
-    
+    tableName = [NSString stringWithFormat:@"WXMFORM_%@_LIST",tableName.uppercaseString];
+    if ([self checkTableName:tableName] == NO) return;
     if ([object isKindOfClass:[NSArray class]] ||
         [object isKindOfClass:[NSDictionary class]] ) {
         [self putObject:object withId:primaryKey intoTable:tableName];
@@ -136,13 +111,15 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (id)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName {
+    tableName = [NSString stringWithFormat:@"WXMFORM_%@_LIST",tableName.uppercaseString];
+    if ([self checkTableName:tableName] == NO) return nil;
     WXMKeyValueItem * item = [self getWXMKeyValueItem:primaryKey fromTable:tableName];
     return item.itemObject;
 }
 
 /************************ 数据库操作 *****************************************/
 
-+ (BOOL)checkTableName:(NSString *)tableName {
+- (BOOL)checkTableName:(NSString *)tableName {
     if (tableName == nil ||
         tableName.length == 0 ||
         [tableName rangeOfString:@" "].location != NSNotFound) {
@@ -150,12 +127,9 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
         return NO;
     }
     
-    /** 建表 */
-    NSString * sql = [NSString stringWithFormat:CREATE_TABLE_SQL, tableName];
-    __block BOOL result;
-    [[WXMFMDBKeyValueStore sharedInstance].dbQueue inDatabase:^(FMDatabase *db) {
-        result = [db executeUpdate:sql];
-    }];
+    if ([self isTableExists:tableName] == NO) {
+        [self createTableWithName:tableName];
+    }
     return YES;
 }
 
@@ -179,10 +153,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)createTableWithName:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
-        return;
-    }
-    
+    if (!tableName) return;
     NSString * sql = [NSString stringWithFormat:CREATE_TABLE_SQL, tableName];
     __block BOOL result;
     [_dbQueue inDatabase:^(FMDatabase *db) {
@@ -195,21 +166,20 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (BOOL)isTableExists:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
-        return NO;
-    }
+    if (!tableName) return NO;
     __block BOOL result;
     [_dbQueue inDatabase:^(FMDatabase *db) {
         result = [db tableExists:tableName];
     }];
+    
     if (!result) {
-        debugLog(@"ERROR, table: %@ not exists in current DB", tableName);
+        debugLog(@"table: %@ not exists in current DB", tableName);
     }
     return result;
 }
 
 - (void)clearTable:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+    if ([self checkTableName:tableName] == NO) {
         return;
     }
     NSString * sql = [NSString stringWithFormat:CLEAR_ALL_SQL, tableName];
@@ -223,7 +193,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)dropTable:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+    if ([self checkTableName:tableName] == NO) {
         return;
     }
     NSString * sql = [NSString stringWithFormat:DROP_TABLE_SQL, tableName];
@@ -239,7 +209,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 /************************ Put&Get methods<封装对象> *****************************************/
 
 - (void)putObject:(id)object withId:(NSString *)objectId intoTable:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+    if ([self checkTableName:tableName] == NO) {
         return;
     }
     NSError * error;
@@ -270,7 +240,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (WXMKeyValueItem *)getWXMKeyValueItem:(NSString *)primaryKey fromTable:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+    if ([self checkTableName:tableName] == NO) {
         return nil;
     }
     NSString * sql = [NSString stringWithFormat:QUERY_ITEM_SQL, tableName];
@@ -334,7 +304,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (NSArray *)getAllItemsFromTable:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+    if ([self checkTableName:tableName] == NO) {
         return nil;
     }
     NSString * sql = [NSString stringWithFormat:SELECT_ALL_SQL, tableName];
@@ -364,9 +334,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     return result;
 }
 
-- (NSUInteger)getCountFromTable:(NSString *)tableName
-{
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+- (NSUInteger)getCountFromTable:(NSString *)tableName {
+    if ([self checkTableName:tableName] == NO) {
         return 0;
     }
     NSString * sql = [NSString stringWithFormat:COUNT_ALL_SQL, tableName];
@@ -382,7 +351,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)deleteObject:(NSString *)primaryKey fromTable:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+    if ([self checkTableName:tableName] == NO) {
         return;
     }
     NSString * sql = [NSString stringWithFormat:DELETE_ITEM_SQL, tableName];
@@ -396,7 +365,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)deleteObjects:(NSArray *)primaryKeyArray fromTable:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+    if ([self checkTableName:tableName] == NO) {
         return;
     }
     NSMutableString *stringBuilder = [NSMutableString string];
@@ -420,7 +389,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)deleteObjectsByIdPrefix:(NSString *)objectIdPrefix fromTable:(NSString *)tableName {
-    if ([WXMFMDBKeyValueStore checkTableName:tableName] == NO) {
+    if ([self checkTableName:tableName] == NO) {
         return;
     }
     NSString *sql = [NSString stringWithFormat:DELETE_ITEMS_WITH_PREFIX_SQL, tableName];
