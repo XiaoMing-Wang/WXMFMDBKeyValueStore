@@ -23,6 +23,7 @@ NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).f
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 #import "FMDatabaseQueue.h"
+#import "NSObject+WXMFMDBConversion.h"
 
 @implementation WXMKeyValueItem
 
@@ -90,31 +91,36 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     return [self initDBWithName:DEFAULT_DB_NAME];
 }
 
-/********************************* NSObject ***********************************************/
-
 /** 存储 model */
 - (void)saveCustomModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey {
     NSString * className = NSStringFromClass([object class]);
     NSString * tableWithName = [NSString stringWithFormat:@"%@_models",className];
-    [self createTableWithName:tableWithName];
+    if ([WXMFMDBKeyValueStore checkTableName:tableWithName] == NO) {
+        return;
+    }
     
-    
-    
-    
+    NSDictionary *dictionary = [object wxm_modelToKeyValue];
+    [self saveAssembleWithAssemble:dictionary primaryKey:primaryKey fromTable:tableWithName];
 }
 
 /** 获取 model */
 - (id)getCustomModelWithClass:(Class)aClass primaryKey:(NSString *)primaryKey {
+    NSString * className = NSStringFromClass(aClass);
+    NSString * tableWithName = [NSString stringWithFormat:@"%@_models",className];
+    WXMKeyValueItem * item = [self getWXMKeyValueItem:primaryKey fromTable:tableWithName];
+    if ([item.itemObject isKindOfClass:[NSDictionary class]]) {
+        id obj = [aClass wxm_modelWithKeyValue:item.itemObject];
+        return obj;
+    }
+    
     return nil;
 }
-
-
-/***************** NSArray NSDictionary NSString NSNumber ********************************/
 
 /** 存储NSArray NSDictionary NSString */
 - (void)saveAssembleWithAssemble:(id<NSCoding,NSObject,NSMutableCopying>)object
                       primaryKey:(NSString *)primaryKey
                        fromTable:(NSString *)tableName {
+    
     if ([object isKindOfClass:[NSArray class]] ||
         [object isKindOfClass:[NSDictionary class]] ) {
         [self putObject:object withId:primaryKey intoTable:tableName];
@@ -129,12 +135,10 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     }
 }
 
-- (id<NSCoding,NSObject,NSMutableCopying>)getAssembleWithPrimaryKey:(NSString *)primaryKey {
-    return nil;
+- (id)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName {
+    WXMKeyValueItem * item = [self getWXMKeyValueItem:primaryKey fromTable:tableName];
+    return item.itemObject;
 }
-
-
-
 
 /************************ 数据库操作 *****************************************/
 
