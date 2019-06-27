@@ -20,7 +20,11 @@
 
 + (void)saveAssembleWithObject:(id)object instanceType:(WXMFMDBInstanceType)instanceType {
     NSString *tableName = WXMFMDBTypeConversion(instanceType);
-    [self saveAssembleWithAssemble:object fromTable:tableName];
+    if (tableName) [self saveAssembleWithAssemble:object fromTable:tableName];
+    if ((tableName == nil || instanceType == WXMFMDBInstanceTypeUseClassName) &&
+        [object isKindOfClass:[NSObject class]]) {
+        [self saveCustomModelWithObject:object];
+    }
 }
 
 + (id)getAssembleWithInstanceType:(WXMFMDBInstanceType)instanceType {
