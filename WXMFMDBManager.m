@@ -20,9 +20,10 @@
 
 + (void)saveAssembleWithObject:(id)object instanceType:(WXMFMDBInstanceType)instanceType {
     NSString *tableName = WXMFMDBTypeConversion(instanceType);
-    if (tableName) [self saveAssembleWithAssemble:object fromTable:tableName];
-    if ((tableName == nil || instanceType == WXMFMDBInstanceTypeUseClassName) &&
-        [object isKindOfClass:[NSObject class]]) {
+    if (instanceType != WXMFMDBInstanceTypeUseClassName) {
+        NSAssert(tableName != nil, @"请设置表名,否则无法判断哪个表");
+    } else if ((instanceType == WXMFMDBInstanceTypeUseClassName) &&
+               [object isKindOfClass:[NSObject class]]) {
         [self saveCustomModelWithObject:object];
     }
 }

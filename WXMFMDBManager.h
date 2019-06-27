@@ -24,6 +24,7 @@ typedef NS_ENUM(NSInteger, WXMFMDBInstanceType) {
     WXMFMDBInstanceTypeBill,
 };
 
+/** 设置tableName */
 static inline NSString *WXMFMDBTypeConversion(WXMFMDBInstanceType type) {
     if (type == WXMFMDBInstanceTypeUseClassName) return nil;
     if (type == WXMFMDBInstanceTypeUser) return @"USER";
