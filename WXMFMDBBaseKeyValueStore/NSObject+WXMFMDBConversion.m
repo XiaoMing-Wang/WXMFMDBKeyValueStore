@@ -68,8 +68,6 @@
     Class aClass;
     unsigned int count;
     NSRange objRange;
-    NSRange dotRange;
-    NSString *aClassStr;
     NSMutableString *aAttribute;
     const char *att = "";
     
@@ -89,13 +87,12 @@
     
     /**  NSArray NSData NSString等 以及自定义类 */
     if(objRange.location != NSNotFound) {
-        dotRange = [aAttribute rangeOfString:@","];
-        if (dotRange.location - 4 > 10000 || dotRange.location - 4 <= 0) return nil;
-        if (aAttribute.length < dotRange.location) return nil;
-        aClassStr = [aAttribute substringWithRange:NSMakeRange(3, dotRange.location - 4)];
-        aClass = NSClassFromString(aClassStr);
+        NSString *aString = [aAttribute componentsSeparatedByString:@","].firstObject;
+        if (aString.length > 4) {
+            aString = [aString substringWithRange:NSMakeRange(3, aString.length - 4)];
+            aClass = NSClassFromString(aString);
+        }
     } else {
-        /** 基础变量 */
         return nil;
     }
     return aClass;
