@@ -91,6 +91,7 @@
     if(objRange.location != NSNotFound) {
         dotRange = [aAttribute rangeOfString:@","];
         if (dotRange.location - 4 > 10000 || dotRange.location - 4 <= 0) return nil;
+        if (aAttribute.length < dotRange.location) return nil;
         aClassStr = [aAttribute substringWithRange:NSMakeRange(3, dotRange.location - 4)];
         aClass = NSClassFromString(aClassStr);
     } else {
