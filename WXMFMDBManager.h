@@ -10,28 +10,24 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/** 忽略大小写 自动转化成全大写 */
+/** 数据库自动加前缀 建议不使用前缀 */
+/** WXMFMDBInstanceType = 0时使用model 如WXMFORM_XXMODEL_LIST */
+/** WXMFMDBInstanceType > 0时使用枚举名 如WXMFORM_USER_INFORMATION_LIST */
 typedef NS_ENUM(NSInteger, WXMFMDBInstanceType) {
+        
     /** 使用ClassName */
-    WXMFMDBInstanceTypeUseClassName = 0,
+    CUSTOM_CLASS = 0,
     
     /** 用户资料 */
-    WXMFMDBInstanceTypeUser,
+    USER_INFORMATION,
     
     /** 用户权限 */
-    WXMFMDBInstanceTypeLimits,
+    USER_LIMITS,
     
     /** 账本 */
-    WXMFMDBInstanceTypeBill,
+    USER_BILL,
 };
-
-/** 设置tableName */
-static inline NSString *WXMFMDBTypeConversion(WXMFMDBInstanceType type) {
-    if (type == WXMFMDBInstanceTypeUseClassName) return nil;
-    if (type == WXMFMDBInstanceTypeUser) return @"USER";
-    if (type == WXMFMDBInstanceTypeLimits) return @"USERLIMITS";
-    if (type == WXMFMDBInstanceTypeBill) return @"BILL";
-    return nil;
-}
 
 @interface WXMFMDBManager : WXMFMDBWrapKeyValueStore
 
