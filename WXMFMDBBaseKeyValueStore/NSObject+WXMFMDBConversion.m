@@ -58,7 +58,9 @@
         class == NSNumber.class) {
         return YES;
     }
-    return NO;
+    
+    if ([class isKindOfClass:NSObject.class]) return NO;
+    return YES;
 }
 
 /** 获取Model属性的类 */
@@ -105,12 +107,10 @@
 }
 
 - (instancetype)wxm_initWithKeyValue:(NSDictionary *)dictionary {
-    NSAssert([dictionary isKindOfClass:[NSDictionary class]], @"此数据为非字典，无法解析"); 
+    NSAssert([dictionary isKindOfClass:[NSDictionary class]], @"此数据为非字典，无法解析");
     [dictionary enumerateKeysAndObjectsUsingBlock:^(NSString *key, id obj, BOOL *stop) {
         NSString *tKey = [self wxm_isExistKey:key];
-        if (tKey && obj) {
-            [self wxm_setKey:key withValue:obj];
-        }
+        if (tKey && obj) [self wxm_setKey:tKey withValue:obj];
     }];
     return self;
 }

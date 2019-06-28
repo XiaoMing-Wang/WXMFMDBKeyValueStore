@@ -94,7 +94,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 - (void)saveAssembleWithAssemble:(id<NSCoding,NSObject,NSMutableCopying>)object
                       primaryKey:(NSString *)primaryKey
                        fromTable:(NSString *)tableName {
-    tableName = [NSString stringWithFormat:@"WXMFORM_%@_LIST",tableName.uppercaseString];
+    tableName = [NSString stringWithFormat:PrefixFormat,tableName.uppercaseString];
     if ([self checkTableName:tableName] == NO) return;
     if ([object isKindOfClass:[NSArray class]] ||
         [object isKindOfClass:[NSDictionary class]] ) {
@@ -111,7 +111,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (id)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName {
-    tableName = [NSString stringWithFormat:@"WXMFORM_%@_LIST",tableName.uppercaseString];
+    tableName = [NSString stringWithFormat:PrefixFormat,tableName.uppercaseString];
     if ([self checkTableName:tableName] == NO) return nil;
     WXMKeyValueItem * item = [self getWXMKeyValueItem:primaryKey fromTable:tableName];
     return item.itemObject;
@@ -179,9 +179,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)clearTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return;
-    }
+    if ([self checkTableName:tableName] == NO)  return;
+   
     NSString * sql = [NSString stringWithFormat:CLEAR_ALL_SQL, tableName];
     __block BOOL result;
     [_dbQueue inDatabase:^(FMDatabase *db) {
@@ -193,9 +192,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)dropTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return;
-    }
+    if (!tableName) return;
+    
     NSString * sql = [NSString stringWithFormat:DROP_TABLE_SQL, tableName];
     __block BOOL result;
     [_dbQueue inDatabase:^(FMDatabase *db) {
@@ -209,9 +207,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 /************************ Put&Get methods<封装对象> *****************************************/
 
 - (void)putObject:(id)object withId:(NSString *)objectId intoTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return;
-    }
+    if ([self checkTableName:tableName] == NO) return;
+   
     NSError * error;
     NSData * data = [NSJSONSerialization dataWithJSONObject:object options:0 error:&error];
     if (error) {
@@ -240,9 +237,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (WXMKeyValueItem *)getWXMKeyValueItem:(NSString *)primaryKey fromTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return nil;
-    }
+    if ([self checkTableName:tableName] == NO) return nil;
+    
     NSString * sql = [NSString stringWithFormat:QUERY_ITEM_SQL, tableName];
     __block NSString * json = nil;
     __block NSDate * createdTime = nil;
@@ -254,6 +250,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
         }
         [rs close];
     }];
+    
     if (json) {
         NSError * error;
         id result = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding] options:(NSJSONReadingAllowFragments) error:&error];
@@ -266,9 +263,9 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
         item.itemObject = result;
         item.createdTime = createdTime;
         return item;
-    } else {
-        return nil;
     }
+    return nil;
+    
 }
 
 - (void)putString:(NSString *)string withId:(NSString *)stringId intoTable:(NSString *)tableName {
@@ -304,9 +301,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (NSArray *)getAllItemsFromTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return nil;
-    }
+    if ([self checkTableName:tableName] == NO) return nil;
+   
     NSString * sql = [NSString stringWithFormat:SELECT_ALL_SQL, tableName];
     __block NSMutableArray * result = [NSMutableArray array];
     [_dbQueue inDatabase:^(FMDatabase *db) {
@@ -335,9 +331,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (NSUInteger)getCountFromTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return 0;
-    }
+    if ([self checkTableName:tableName] == NO) return 0;
+   
     NSString * sql = [NSString stringWithFormat:COUNT_ALL_SQL, tableName];
     __block NSInteger num = 0;
     [_dbQueue inDatabase:^(FMDatabase *db) {
@@ -351,9 +346,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)deleteObject:(NSString *)primaryKey fromTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return;
-    }
+    if ([self checkTableName:tableName] == NO) return;
+   
     NSString * sql = [NSString stringWithFormat:DELETE_ITEM_SQL, tableName];
     __block BOOL result;
     [_dbQueue inDatabase:^(FMDatabase *db) {
@@ -365,9 +359,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)deleteObjects:(NSArray *)primaryKeyArray fromTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return;
-    }
+    if ([self checkTableName:tableName] == NO) return;
+   
     NSMutableString *stringBuilder = [NSMutableString string];
     for (id objectId in primaryKeyArray) {
         NSString *item = [NSString stringWithFormat:@" '%@' ", objectId];
@@ -389,9 +382,8 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 }
 
 - (void)deleteObjectsByIdPrefix:(NSString *)objectIdPrefix fromTable:(NSString *)tableName {
-    if ([self checkTableName:tableName] == NO) {
-        return;
-    }
+    if ([self checkTableName:tableName] == NO) return;
+    
     NSString *sql = [NSString stringWithFormat:DELETE_ITEMS_WITH_PREFIX_SQL, tableName];
     NSString *prefixArgument = [NSString stringWithFormat:@"%@%%", objectIdPrefix];
     __block BOOL result;

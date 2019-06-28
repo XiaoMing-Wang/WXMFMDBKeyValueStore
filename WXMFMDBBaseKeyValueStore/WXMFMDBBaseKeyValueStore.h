@@ -5,7 +5,7 @@
 //  Created by edz on 2019/6/26.
 //  Copyright © 2019 wq. All rights reserved.
 //
-
+#define PrefixFormat @"WXMFORM_%@_LIST"
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearTable:(NSString *)tableName;
 - (void)dropTable:(NSString *)tableName;
 - (void)close;
+
+/************************ 存储操作 *****************************************/
 
 /** 存储model */
 - (void)saveCustomModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey;

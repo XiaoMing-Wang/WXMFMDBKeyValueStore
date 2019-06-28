@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - 公用方法
 
 /** 设置对应的key  */
-//- (NSDictionary *)wxm_modelMapPropertyNames;
+/**- (NSDictionary *)wxm_modelMapPropertyNames;*/
 
 /** 字典->模型 */
 + (instancetype)wxm_modelWithKeyValue:(NSDictionary *)dictionary;
