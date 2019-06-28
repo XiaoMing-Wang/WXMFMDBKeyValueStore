@@ -31,7 +31,7 @@
     }];
 }
 
-/** 删除所有监听者 */
+/** 删除所有属性监听 */
 - (void)removeAllProperty {
     [self.attributeArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
         if (obj.length <= 0) return;
@@ -47,7 +47,11 @@
                         change:(NSDictionary *)change
                        context:(void *)context {
     if ([self.attributeArray containsObject:keyPath]) {
+        id newVal = [change objectForKey:NSKeyValueChangeNewKey];
         [self wxm_parametersChange];
+        if ([self.observer respondsToSelector:@selector(wxm_propertyChangeWithKey:newValue:)]) {
+            [self.observer wxm_propertyChangeWithKey:keyPath newValue:newVal];
+        }
     }
 }
 
