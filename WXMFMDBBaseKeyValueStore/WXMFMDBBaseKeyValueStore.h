@@ -39,11 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)saveAssembleWithAssemble:(id<NSCopying,NSMutableCopying>)object
                       primaryKey:(NSString *)primaryKey
                        fromTable:(NSString *)tableName;
-
 - (id)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName;
-
-/** 获取 */
-- (WXMKeyValueItem *)getWXMKeyValueItem:(NSString *)primaryKey fromTable:(NSString *)tableName;
 
 /** 删除 */
 - (void)deleteObject:(NSString *)primaryKey fromTable:(NSString *)tableName;

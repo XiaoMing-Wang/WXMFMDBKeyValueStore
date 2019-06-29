@@ -12,7 +12,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol WXMObserverObjectCallBack <NSObject>
+
+/** WXMObserverObject属性变化回调 */
 - (void)wxm_propertyChangeWithKey:(NSString *)key newValue:(id)value;
+
 @end
 
 

@@ -20,12 +20,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setUserID:(NSString *)userID;
 
 /** 存取model 以Class作为表名不区分大小写 */
-+ (void)saveCustomModelWithObject:(id)object;
-+ (id)getCustomModelWithClass:(Class)aClass;
++ (void)saveCustomModelWithObject:(NSObject *)object;
++ (void)saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray;
++ (__kindof NSObject *)getCustomModelWithClass:(Class)aClass;
++ (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass;
 
 /** 存取json (NSString, NSArray,NSDictionary) */
 + (void)saveAssembleWithAssemble:(id)object fromTable:(NSString *)tableName;
-+ (id)getAssembleWithTable:(NSString *)tableName;
++ (id<NSCopying,NSMutableCopying>)getAssembleWithTable:(NSString *)tableName;
 @end
 
 NS_ASSUME_NONNULL_END

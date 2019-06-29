@@ -5,10 +5,13 @@
 //  Created by edz on 2019/6/27.
 //  Copyright © 2019 wq. All rights reserved.
 //
-#define WXMEnumToString(enumSign) [NSString stringWithFormat:@"%s",(#enumSign)]
 #import "WXMFMDBManager.h"
 
 @implementation WXMFMDBManager
+
++ (void)setUserID:(NSString *)userID {
+    [super setUserID:userID];
+}
 
 + (void)saveCustomModelWithObject:(id)object {
     [super saveCustomModelWithObject:object];
@@ -16,6 +19,14 @@
 
 + (id)getCustomModelWithClass:(Class)aClass {
     return [super getCustomModelWithClass:aClass];
+}
+
++ (void)saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray {
+    [super saveCustomModelWithObjects:objectArray];
+}
+
++ (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass {
+    return [super getCustomModelArrayWithClass:aClass];
 }
 
 + (void)saveAssembleWithObject:(id)object instanceType:(WXMFMDBInstanceType)instanceType {
@@ -31,6 +42,5 @@
 + (id)getAssembleWithInstanceType:(WXMFMDBInstanceType)instanceType {
     return [self getAssembleWithTable:WXMEnumToString(instanceType)];
 }
-
 
 @end

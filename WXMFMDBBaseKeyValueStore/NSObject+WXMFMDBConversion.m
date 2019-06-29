@@ -14,21 +14,6 @@
 /** 获取映射的key(无使用原来的key) */
 - (NSString *)wxm_isExistKey:(NSString *)key {
     
-    /** 有映射 */
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-    SEL sel = NSSelectorFromString(@"wxm_modelMapPropertyNames");
-    if([self respondsToSelector:sel]){
-        NSDictionary *map = [self performSelector:sel];
-#pragma clang diagnostic pop
-        __block NSString *newKey = nil;
-        [map enumerateKeysAndObjectsUsingBlock:^(NSString* dkey, NSString* obj, BOOL *stop) {
-            if([key isEqualToString:dkey]) newKey = obj;
-        }];
-        if (newKey) return newKey;
-    }
-    
-    /** 无映射 */
     unsigned int count = 0;
     objc_property_t *propertys = class_copyPropertyList([self class], &count);
     for (int i = 0; i < count; i++) {
@@ -150,7 +135,7 @@
             if (value) [dic setValue:value forKey:dicKey];
         } else {
             
-            /**  自定义类 */
+            /**  自定义类递归赋值 */
             value =  [propertyValue wxm_modelToKeyValue];
             if (value) [dic setValue:value forKey:dicKey];
         }

@@ -47,8 +47,8 @@
                         change:(NSDictionary *)change
                        context:(void *)context {
     if ([self.attributeArray containsObject:keyPath]) {
-        id newVal = [change objectForKey:NSKeyValueChangeNewKey];
         [self wxm_parametersChange];
+        id newVal = [change objectForKey:NSKeyValueChangeNewKey];
         if ([self.observer respondsToSelector:@selector(wxm_propertyChangeWithKey:newValue:)]) {
             [self.observer wxm_propertyChangeWithKey:keyPath newValue:newVal];
         }

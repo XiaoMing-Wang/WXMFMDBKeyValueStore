@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** WXMFMDBInstanceType = 0时使用model 如WXMFORM_XXMODEL_LIST */
 /** WXMFMDBInstanceType > 0时使用枚举名 如WXMFORM_USER_INFORMATION_LIST */
 typedef NS_ENUM(NSInteger, WXMFMDBInstanceType) {
-        
+    
     /** 使用ClassName */
     CUSTOM_CLASS = 0,
     
@@ -31,14 +31,19 @@ typedef NS_ENUM(NSInteger, WXMFMDBInstanceType) {
 
 @interface WXMFMDBManager : WXMFMDBWrapKeyValueStore
 
-/** 需要调用改方法设置userID 数据库所有的表都使用userid作为key
- + (void)setUserID:(NSString *)userID; */
+#pragma mark 父类的方法
+/** 需要调用改方法设置userID 数据库所有的表都使用userid作为key */
+ + (void)setUserID:(NSString *)userID;
 
 /** 父类的方法 type为 WXMFMDBInstanceTypeUseClassName */
 + (void)saveCustomModelWithObject:(id)object;
 + (id)getCustomModelWithClass:(Class)aClass;
 
-/** 自己命名的表 */
++ (void)saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray;
++ (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass;
+
+#pragma mark 自己的方法
+/** 自己命名的表 传自定义model会调用saveCustomModelWithObject */
 + (void)saveAssembleWithObject:(id)object instanceType:(WXMFMDBInstanceType)instanceType;
 + (id)getAssembleWithInstanceType:(WXMFMDBInstanceType)instanceType;
 @end
