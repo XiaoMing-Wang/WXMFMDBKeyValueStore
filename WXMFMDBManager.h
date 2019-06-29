@@ -37,9 +37,9 @@ typedef NS_ENUM(NSInteger, WXMFMDBInstanceType) {
 
 /** 父类的方法 type为 WXMFMDBInstanceTypeUseClassName */
 + (void)saveCustomModelWithObject:(id)object;
-+ (id)getCustomModelWithClass:(Class)aClass;
-
 + (void)saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray;
+
++ (id)getCustomModelWithClass:(Class)aClass;
 + (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass;
 
 #pragma mark 自己的方法
