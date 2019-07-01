@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** WXMObserverObject属性变化回调 */
 - (void)wxm_propertyChangeWithKey:(NSString *)key newValue:(id)value;
 
+
 @end
 
 
