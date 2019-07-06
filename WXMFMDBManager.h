@@ -5,47 +5,34 @@
 //  Created by edz on 2019/6/27.
 //  Copyright © 2019 wq. All rights reserved.
 //
-
 #import "WXMFMDBWrapKeyValueStore.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
-/** 忽略大小写 自动转化成全大写 */
-/** 数据库自动加前缀 建议不使用前缀 */
-/** WXMFMDBInstanceType = 0时使用model 如WXMFORM_XXMODEL_LIST */
-/** WXMFMDBInstanceType > 0时使用枚举名 如WXMFORM_USER_INFORMATION_LIST */
-typedef NS_ENUM(NSInteger, WXMFMDBInstanceType) {
-    
-    /** 使用ClassName */
-    CUSTOM_CLASS = 0,
-    
-    /** 用户资料 */
-    USER_INFORMATION,
-    
-    /** 用户权限 */
-    USER_LIMITS,
-    
-    /** 账本 */
-    USER_BILL,
-};
+typedef NSString *WXMFMDBTableType NS_STRING_ENUM;
+
+/******************************** 表名 ********************************/
+static WXMFMDBTableType const CUSTOM_CLASS = @"CUSTOM_CLASS";            /* model */
+static WXMFMDBTableType const USER_INFORMATION = @"USER_INFORMATION";    /* 用户列表 */
+static WXMFMDBTableType const USER_LIMITS = @"USER_LIMITS";              /* 权限 */
+static WXMFMDBTableType const USER_BILL = @"USER_BILL";                  /* 账本 */
+/******************************** 表名 ********************************/
 
 @interface WXMFMDBManager : WXMFMDBWrapKeyValueStore
 
 #pragma mark 父类的方法
 /** 需要调用改方法设置userID 数据库所有的表都使用userid作为key */
- + (void)setUserID:(NSString *)userID;
+ + (void)wxm_setUserID:(NSString *)userID;
 
 /** 父类的方法 type为 WXMFMDBInstanceTypeUseClassName */
-+ (void)saveCustomModelWithObject:(id)object;
-+ (void)saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray;
++ (void)wxm_saveCustomModelWithObject:(id)object;
++ (void)wxm_saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray;
 
-+ (id)getCustomModelWithClass:(Class)aClass;
-+ (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass;
++ (id)wxm_getCustomModelWithClass:(Class)aClass;
++ (NSArray <NSObject *>*)wxm_getCustomModelArrayWithClass:(Class)aClass;
 
 #pragma mark 自己的方法
-/** 自己命名的表 传自定义model会调用saveCustomModelWithObject */
-+ (void)saveAssembleWithObject:(id)object instanceType:(WXMFMDBInstanceType)instanceType;
-+ (id)getAssembleWithInstanceType:(WXMFMDBInstanceType)instanceType;
++ (void)wxm_saveAssembleWithObject:(id)object instanceType:(WXMFMDBTableType)instanceType;
++ (id)wxm_getAssembleWithInstanceType:(WXMFMDBTableType)instanceType;
 @end
 
 NS_ASSUME_NONNULL_END

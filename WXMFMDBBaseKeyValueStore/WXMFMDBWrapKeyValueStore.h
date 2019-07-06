@@ -6,7 +6,6 @@
 //  Copyright © 2019 wq. All rights reserved.
 //
 /** tableName不区分大小写 */
-#define WXMEnumToString(enumSign) [NSString stringWithFormat:@"%s",(#enumSign)]
 #import "WXMFMDBBaseKeyValueStore.h"
 
 NS_ASSUME_NONNULL_BEGIN

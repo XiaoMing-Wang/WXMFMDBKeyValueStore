@@ -9,38 +9,37 @@
 
 @implementation WXMFMDBManager
 
-+ (void)setUserID:(NSString *)userID {
++ (void)wxm_setUserID:(NSString *)userID {
     [super setUserID:userID];
 }
 
-+ (void)saveCustomModelWithObject:(id)object {
++ (void)wxm_saveCustomModelWithObject:(id)object {
     [super saveCustomModelWithObject:object];
 }
 
-+ (id)getCustomModelWithClass:(Class)aClass {
++ (id)wxm_getCustomModelWithClass:(Class)aClass {
     return [super getCustomModelWithClass:aClass];
 }
 
-+ (void)saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray {
++ (void)wxm_saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray {
     [super saveCustomModelWithObjects:objectArray];
 }
 
-+ (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass {
++ (NSArray <NSObject *>*)wxm_getCustomModelArrayWithClass:(Class)aClass {
     return [super getCustomModelArrayWithClass:aClass];
 }
 
-+ (void)saveAssembleWithObject:(id)object instanceType:(WXMFMDBInstanceType)instanceType {
-    NSString *tableName = WXMEnumToString(instanceType);
-    if (instanceType > CUSTOM_CLASS) {
-        NSAssert(tableName != nil, @"请设置表名,否则无法判断哪个表");
-        [self saveAssembleWithAssemble:object fromTable:tableName];
-    } else if ((instanceType == CUSTOM_CLASS) && [object isKindOfClass:[NSObject class]]) {
++ (void)wxm_saveAssembleWithObject:(id)object instanceType:(WXMFMDBTableType)instanceType {
+    if ([instanceType isEqualToString:CUSTOM_CLASS] == NO) {
+        NSAssert(instanceType != nil, @"请设置表名,否则无法判断哪个表");
+        [self saveAssembleWithAssemble:object fromTable:instanceType];
+    } else if(([instanceType isEqualToString:CUSTOM_CLASS]) && [object isKindOfClass:NSObject.class]) {
         [self saveCustomModelWithObject:object];
     }
 }
 
-+ (id)getAssembleWithInstanceType:(WXMFMDBInstanceType)instanceType {
-    return [self getAssembleWithTable:WXMEnumToString(instanceType)];
++ (id)wxm_getAssembleWithInstanceType:(WXMFMDBTableType)instanceType {
+    return [self getAssembleWithTable:instanceType];
 }
 
 @end
