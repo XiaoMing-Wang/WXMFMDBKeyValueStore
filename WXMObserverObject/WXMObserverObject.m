@@ -33,6 +33,7 @@
 
 /** 删除所有属性监听 */
 - (void)removeAllProperty {
+    if (!self.attributeArray || self.attributeArray.count == 0) return;
     [self.attributeArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
         if (obj.length <= 0) return;
         @try {

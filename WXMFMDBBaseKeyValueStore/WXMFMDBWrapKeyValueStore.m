@@ -26,61 +26,83 @@
 
 /** 设置userID 所有的表使用userID作为key */
 + (void)setUserID:(NSString *)userID {
-    [[self sharedInstance] setUserID:userID];
+    [self.sharedInstance setUserID:userID];
 }
 
 + (BOOL)judgeExsitUserID {
-    return ([[self sharedInstance] userID].length > 0);
+    return ([self.sharedInstance userID].length > 0);
 }
 
 + (NSString *)userID {
-    return [WXMFMDBWrapKeyValueStore sharedInstance].userID;
+    return [self.sharedInstance userID];
 }
+
+#pragma mark _____________________________________________ model
 
 + (void)saveCustomModelWithObject:(NSObject *)object {
     NSAssert([self judgeExsitUserID], @"请设置userID");
-    [[self sharedInstance] saveCustomModelWithObject:object primaryKey:self.userID];
+    
+    NSString *tableName = NSStringFromClass([object class]);
+    NSDictionary *dictionary = [object wxm_modelToKeyValue];
+    [self saveAssembleWithAssemble:dictionary fromTable:tableName];
 }
 
-+ (id)getCustomModelWithClass:(Class)aClass {
+/** 存数组 */
++ (void)saveCustomModelWithObjectArray:(NSArray <NSObject *>*)objectArray {
     NSAssert([self judgeExsitUserID], @"请设置userID");
-    return [[self sharedInstance] getCustomModelWithClass:aClass primaryKey:self.userID];
-}
-
-+ (void)saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray {
+    
     id firstObj = objectArray.firstObject;
     if (objectArray.count == 0 || !firstObj) return;
     
     NSMutableArray *array = @[].mutableCopy;
-    NSString * tableName = NSStringFromClass([firstObj class]);
+    NSString *tableName = NSStringFromClass([firstObj class]);
     [objectArray enumerateObjectsUsingBlock:^(NSObject *obj, NSUInteger idx, BOOL *stop) {
-        NSDictionary * json = obj.wxm_modelToKeyValue;
+        NSDictionary *json = obj.wxm_modelToKeyValue;
         [array addObject:json];
     }];
+    
     [self saveAssembleWithAssemble:array fromTable:tableName];
 }
 
++ (NSObject *)getCustomModelWithClass:(Class)aClass {
+    NSAssert([self judgeExsitUserID], @"请设置userID");
+    
+    id dictionary = [self getAssembleWithTable:NSStringFromClass(aClass)];
+    if ([dictionary isKindOfClass:[NSDictionary class]]) {
+        return [aClass wxm_modelWithKeyValue:dictionary];
+    }
+    return nil;
+}
+
 + (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass {
+    NSAssert([self judgeExsitUserID], @"请设置userID");
+    
     NSString *tableName = NSStringFromClass(aClass);
     NSArray *array = (NSArray *) [self getAssembleWithTable:tableName];
     NSMutableArray *modelArray = @[].mutableCopy;
-    [array enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL *stop) {
-        id model = [aClass wxm_modelWithKeyValue:obj];
-        if (model) [modelArray addObject:model];
+    [array enumerateObjectsUsingBlock:^(NSDictionary *dictionary, NSUInteger idx, BOOL *stop) {
+        id object = [aClass wxm_modelWithKeyValue:dictionary];
+        if (object) [modelArray addObject:object];
     }];
     return modelArray.copy;
 }
 
+#pragma mark _____________________________________________ json
+
 + (void)saveAssembleWithAssemble:(id)object fromTable:(NSString *)tableName {
-    WXMFMDBWrapKeyValueStore * instance = [self sharedInstance];
     NSAssert([self judgeExsitUserID], @"请设置userID");
-    [instance saveAssembleWithAssemble:object primaryKey:self.userID fromTable:tableName];
+    [self.sharedInstance saveAssembleWithAssemble:object
+                                       primaryKey:self.userID
+                                        fromTable:tableName];
 }
 
 + (id)getAssembleWithTable:(NSString *)tableName {
     NSAssert([self judgeExsitUserID], @"请设置userID");
-    return [[self sharedInstance] getAssembleWithPrimaryKey:self.userID fromTable:tableName];
+    return [self.sharedInstance getAssembleWithPrimaryKey:self.userID fromTable:tableName];
 }
 
-
+/** 删除列表 */
+- (void)clearCustomTable:(NSString *)tableName {
+    [self.class.sharedInstance clearTable:tableName];
+}
 @end

@@ -19,26 +19,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface WXMFMDBBaseKeyValueStore : NSObject
 
-/************************ 数据库操作 *****************************************/
-
 - (id)initDBWithName:(NSString *)dbName;
-- (id)initWithDBWithPath:(NSString *)dbPath;
 - (void)createTableWithName:(NSString *)tableName;
 - (BOOL)isTableExists:(NSString *)tableName;
 - (void)clearTable:(NSString *)tableName;
 - (void)dropTable:(NSString *)tableName;
 - (void)close;
 
-/************************ 存储操作 *****************************************/
-
-/** 存储model */
-- (void)saveCustomModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey;
-- (id)getCustomModelWithClass:(Class)aClass primaryKey:(NSString *)primaryKey;
-
 /** 存储NSArray NSDictionary NSString NSNumber */
 - (void)saveAssembleWithAssemble:(id<NSCopying,NSMutableCopying>)object
                       primaryKey:(NSString *)primaryKey
                        fromTable:(NSString *)tableName;
+
 - (id)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName;
 
 /** 删除 */
@@ -47,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deleteObjectsByIdPrefix:(NSString *)objectIdPrefix fromTable:(NSString *)tableName;
 
 /** 获取所有的item */
-- (NSArray <WXMKeyValueItem *>*)getAllItemsFromTable:(NSString *)tableName;
+- (NSArray <id>*)getAllItemsFromTable:(NSString *)tableName;
 - (NSUInteger)getCountFromTable:(NSString *)tableName;
 
 @end

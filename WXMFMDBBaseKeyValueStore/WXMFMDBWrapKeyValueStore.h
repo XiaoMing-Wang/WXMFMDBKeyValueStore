@@ -20,13 +20,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** 存取model 以Class作为表名不区分大小写 */
 + (void)saveCustomModelWithObject:(NSObject *)object;
-+ (void)saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray;
-+ (__kindof NSObject *)getCustomModelWithClass:(Class)aClass;
++ (void)saveCustomModelWithObjectArray:(NSArray <NSObject *>*)objectArray;
++ (NSObject *)getCustomModelWithClass:(Class)aClass;
 + (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass;
 
 /** 存取json (NSString, NSArray,NSDictionary) */
 + (void)saveAssembleWithAssemble:(id)object fromTable:(NSString *)tableName;
 + (id<NSCopying,NSMutableCopying>)getAssembleWithTable:(NSString *)tableName;
+
+/** 删除列表 */
+- (void)clearCustomTable:(NSString *)tableName;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -9,36 +9,44 @@
 
 @implementation WXMFMDBManager
 
-+ (void)wxm_setUserID:(NSString *)userID {
-    [super setUserID:userID];
++ (void)wf_setUserID:(NSString *)userID {
+    [self setUserID:userID];
 }
 
-+ (void)wxm_saveCustomModelWithObject:(id)object {
-    [super saveCustomModelWithObject:object];
+/** 对象 */
++ (void)wf_saveCustomModelWithObject:(id)object {
+    [self saveCustomModelWithObject:object];
 }
 
-+ (id)wxm_getCustomModelWithClass:(Class)aClass {
-    return [super getCustomModelWithClass:aClass];
++ (id)wf_getCustomModelWithClass:(Class)aClass {
+    return [self getCustomModelWithClass:aClass];
 }
 
-+ (void)wxm_saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray {
-    [super saveCustomModelWithObjects:objectArray];
+/** 数组 */
++ (void)wf_saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray {
+    [self saveCustomModelWithObjectArray:objectArray];
 }
 
-+ (NSArray <NSObject *>*)wxm_getCustomModelArrayWithClass:(Class)aClass {
-    return [super getCustomModelArrayWithClass:aClass];
++ (NSArray <NSObject *>*)wf_getCustomModelArrayWithClass:(Class)aClass {
+    return [self getCustomModelArrayWithClass:aClass];
 }
 
-+ (void)wxm_saveAssembleWithObject:(id)object instanceType:(WXMFMDBTableType)instanceType {
+/** json */
++ (void)wf_saveAssembleWithObject:(id)object instanceType:(WXMFMDBTableType)instanceType {
+    NSAssert(instanceType != nil, @"请设置表名,否则无法判断哪个表");
+    
+    /** json */
     if ([instanceType isEqualToString:CUSTOM_CLASS] == NO) {
-        NSAssert(instanceType != nil, @"请设置表名,否则无法判断哪个表");
         [self saveAssembleWithAssemble:object fromTable:instanceType];
-    } else if(([instanceType isEqualToString:CUSTOM_CLASS]) && [object isKindOfClass:NSObject.class]) {
-        [self saveCustomModelWithObject:object];
+        
+        /** model */
+    } else if([instanceType isEqualToString:CUSTOM_CLASS] && [object isKindOfClass:NSObject.class]) {
+        [self wf_saveCustomModelWithObject:object];
     }
 }
 
-+ (id)wxm_getAssembleWithInstanceType:(WXMFMDBTableType)instanceType {
++ (id)wf_getAssembleWithInstanceType:(WXMFMDBTableType)instanceType {
+    NSAssert(instanceType != nil, @"请设置表名,否则无法判断哪个表");
     return [self getAssembleWithTable:instanceType];
 }
 
