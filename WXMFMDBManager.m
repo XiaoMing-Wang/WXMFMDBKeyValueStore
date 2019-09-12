@@ -22,31 +22,25 @@
     return [self getCustomModelWithClass:aClass];
 }
 
-/** 数组 */
-+ (void)wf_saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray {
-    [self saveCustomModelWithObjectArray:objectArray];
-}
-
-+ (NSArray <NSObject *>*)wf_getCustomModelArrayWithClass:(Class)aClass {
-    return [self getCustomModelArrayWithClass:aClass];
-}
-
 /** json */
 + (void)wf_saveAssembleWithObject:(id)object instanceType:(WXMFMDBTableType)instanceType {
-    NSAssert(instanceType != nil, @"请设置表名,否则无法判断哪个表");
+    NSAssert(instanceType != nil, @"请设置表名, 否则无法判断哪个表");
     
     /** json */
     if ([instanceType isEqualToString:CUSTOM_CLASS] == NO) {
+        
         [self saveAssembleWithAssemble:object fromTable:instanceType];
         
         /** model */
-    } else if([instanceType isEqualToString:CUSTOM_CLASS] && [object isKindOfClass:NSObject.class]) {
+    } else if ([instanceType isEqualToString:CUSTOM_CLASS] &&
+               [object isKindOfClass:NSObject.class]) {
+        
         [self wf_saveCustomModelWithObject:object];
     }
 }
 
 + (id)wf_getAssembleWithInstanceType:(WXMFMDBTableType)instanceType {
-    NSAssert(instanceType != nil, @"请设置表名,否则无法判断哪个表");
+    NSAssert(instanceType != nil, @"请设置表名, 否则无法判断哪个表");
     return [self getAssembleWithTable:instanceType];
 }
 

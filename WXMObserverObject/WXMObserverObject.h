@@ -11,18 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol WXMObserverObjectCallBack <NSObject>
-
-/** WXMObserverObject属性变化回调 */
-- (void)wxm_propertyChangeWithKey:(NSString *)key newValue:(id)value;
-
-
-@end
-
-
 @interface WXMObserverObject : NSObject
-
-@property (nonatomic, weak) id<WXMObserverObjectCallBack> observer;
 
 /** 参数变化调用函数 */
 - (void)wxm_parametersChange;

@@ -35,9 +35,8 @@
 - (void)removeAllProperty {
     if (!self.attributeArray || self.attributeArray.count == 0) return;
     [self.attributeArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
-        if (obj.length <= 0) return;
         @try {
-            [self removeObserver:self forKeyPath:obj];
+            if (obj.length > 0) [self removeObserver:self forKeyPath:obj];
         } @catch (NSException *exception) {} @finally {}
     }];
 }
@@ -49,10 +48,6 @@
                        context:(void *)context {
     if ([self.attributeArray containsObject:keyPath]) {
         [self wxm_parametersChange];
-        id newVal = [change objectForKey:NSKeyValueChangeNewKey];
-        if ([self.observer respondsToSelector:@selector(wxm_propertyChangeWithKey:newValue:)]) {
-            [self.observer wxm_propertyChangeWithKey:keyPath newValue:newVal];
-        }
     }
 }
 
@@ -63,21 +58,25 @@
 
 /** 获取所有属性 */
 + (NSArray *)wxm_getFropertys {
-    unsigned int count = 0;
-    NSMutableArray *_arrayM = @[].mutableCopy;
-    objc_property_t *propertys = class_copyPropertyList([self class], &count);
-    for (int i = 0; i < count; i++) {
-        objc_property_t property = propertys[i];
-        NSString *pro = [NSString stringWithCString:property_getName(property)
-                                           encoding:NSUTF8StringEncoding];
-        [_arrayM addObject:pro];
-    }
-    return _arrayM;
+    @try {
+        unsigned int count = 0;
+        NSMutableArray *_arrayM = @[].mutableCopy;
+        objc_property_t *propertys = class_copyPropertyList([self class], &count);
+        for (int i = 0; i < count; i++) {
+            objc_property_t property = propertys[i];
+            NSString *pro = [NSString stringWithCString:property_getName(property)
+                                               encoding:NSUTF8StringEncoding];
+            [_arrayM addObject:pro];
+        }
+        return _arrayM;
+    } @catch (NSException *exception) {} @finally {}
 }
 
 - (void)dealloc {
+    @try {
+        [self removeAllProperty];
+    } @catch (NSException *exception) {} @finally {}
     NSLog(@"%@被释放",NSStringFromClass(self.class));
-    [self removeAllProperty];
 }
 
 - (NSMutableArray<NSString *> *)attributeArray {

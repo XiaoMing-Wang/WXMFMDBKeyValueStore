@@ -47,23 +47,6 @@
     [self saveAssembleWithAssemble:dictionary fromTable:tableName];
 }
 
-/** 存数组 */
-+ (void)saveCustomModelWithObjectArray:(NSArray <NSObject *>*)objectArray {
-    NSAssert([self judgeExsitUserID], @"请设置userID");
-    
-    id firstObj = objectArray.firstObject;
-    if (objectArray.count == 0 || !firstObj) return;
-    
-    NSMutableArray *array = @[].mutableCopy;
-    NSString *tableName = NSStringFromClass([firstObj class]);
-    [objectArray enumerateObjectsUsingBlock:^(NSObject *obj, NSUInteger idx, BOOL *stop) {
-        NSDictionary *json = obj.wxm_modelToKeyValue;
-        [array addObject:json];
-    }];
-    
-    [self saveAssembleWithAssemble:array fromTable:tableName];
-}
-
 + (NSObject *)getCustomModelWithClass:(Class)aClass {
     NSAssert([self judgeExsitUserID], @"请设置userID");
     
@@ -72,19 +55,6 @@
         return [aClass wxm_modelWithKeyValue:dictionary];
     }
     return nil;
-}
-
-+ (NSArray <NSObject *>*)getCustomModelArrayWithClass:(Class)aClass {
-    NSAssert([self judgeExsitUserID], @"请设置userID");
-    
-    NSString *tableName = NSStringFromClass(aClass);
-    NSArray *array = (NSArray *) [self getAssembleWithTable:tableName];
-    NSMutableArray *modelArray = @[].mutableCopy;
-    [array enumerateObjectsUsingBlock:^(NSDictionary *dictionary, NSUInteger idx, BOOL *stop) {
-        id object = [aClass wxm_modelWithKeyValue:dictionary];
-        if (object) [modelArray addObject:object];
-    }];
-    return modelArray.copy;
 }
 
 #pragma mark _____________________________________________ json

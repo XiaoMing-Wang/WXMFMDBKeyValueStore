@@ -19,12 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)wf_saveCustomModelWithObject:(id)object;
 + (id)wf_getCustomModelWithClass:(Class)aClass;
 
-/** 数组 */
-+ (void)wf_saveCustomModelWithObjects:(NSArray <NSObject *>*)objectArray;
-+ (NSArray <NSObject *>*)wf_getCustomModelArrayWithClass:(Class)aClass;
-
 /** json */
-+ (void)wf_saveAssembleWithObject:(id)object instanceType:(WXMFMDBTableType)instanceType;
++ (void)wf_saveAssembleWithObject:(id<NSCoding>)object instanceType:(WXMFMDBTableType)instanceType;
 + (id)wf_getAssembleWithInstanceType:(WXMFMDBTableType)instanceType;
 @end
 
