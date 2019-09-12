@@ -42,18 +42,23 @@
 + (void)saveCustomModelWithObject:(NSObject *)object {
     NSAssert([self judgeExsitUserID], @"请设置userID");
     
-    NSString *tableName = NSStringFromClass([object class]);
-    NSDictionary *dictionary = [object wxm_modelToKeyValue];
-    [self saveAssembleWithAssemble:dictionary fromTable:tableName];
+    @try {
+        NSString *tableName = NSStringFromClass([object class]);
+        NSDictionary *dictionary = [object wxm_modelToKeyValue];
+        [self saveAssembleWithAssemble:dictionary fromTable:tableName];
+    } @catch (NSException *exception) {} @finally {}
 }
 
 + (NSObject *)getCustomModelWithClass:(Class)aClass {
     NSAssert([self judgeExsitUserID], @"请设置userID");
     
-    id dictionary = [self getAssembleWithTable:NSStringFromClass(aClass)];
-    if ([dictionary isKindOfClass:[NSDictionary class]]) {
-        return [aClass wxm_modelWithKeyValue:dictionary];
-    }
+    @try {
+        id dictionary = [self getAssembleWithTable:NSStringFromClass(aClass)];
+        if ([dictionary isKindOfClass:[NSDictionary class]]) {
+            return [aClass wxm_modelWithKeyValue:dictionary];
+        }
+    } @catch (NSException *exception) {} @finally {}
+    
     return nil;
 }
 
@@ -61,6 +66,7 @@
 
 + (void)saveAssembleWithAssemble:(id)object fromTable:(NSString *)tableName {
     NSAssert([self judgeExsitUserID], @"请设置userID");
+    
     [self.sharedInstance saveAssembleWithAssemble:object
                                        primaryKey:self.userID
                                         fromTable:tableName];

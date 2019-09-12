@@ -51,23 +51,6 @@ static NSString *const DELETE_ITEMS_SQL = @"DELETE from %@ where id in ( %@ )";
 static NSString *const DELETE_ITEMS_WITH_PREFIX_SQL = @"DELETE from %@ where id like ? ";
 static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
-///** 存储 model */
-//- (void)saveCustomModelWithObject:(NSObject *)object primaryKey:(NSString *)primaryKey {
-//    NSString * tableWithName = NSStringFromClass([object class]);
-//    NSDictionary *dictionary = [object wxm_modelToKeyValue];
-//    [self saveAssembleWithAssemble:dictionary primaryKey:primaryKey fromTable:tableWithName];
-//}
-//
-///** 获取 model */
-//- (id)getCustomModelWithClass:(Class)aClass primaryKey:(NSString *)primaryKey {
-//    NSString * className = NSStringFromClass(aClass);
-//    id dictionary = [self getAssembleWithPrimaryKey:primaryKey fromTable:className];
-//    if ([dictionary isKindOfClass:[NSDictionary class]]) {
-//        return [aClass wxm_modelWithKeyValue:dictionary];
-//    }
-//    return nil;
-//}
-
 /** 存储NSArray NSDictionary NSString */
 - (void)saveAssembleWithAssemble:(id<NSCoding,NSObject,NSMutableCopying>)object
                       primaryKey:(NSString *)primaryKey
