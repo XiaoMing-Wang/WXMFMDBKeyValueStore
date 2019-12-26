@@ -87,7 +87,10 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     BOOL isDir = NO;
     BOOL isExists = [man fileExistsAtPath:cache isDirectory:&isDir];
     if (!isExists || !isDir) {
-        [man createDirectoryAtPath:cache withIntermediateDirectories:YES attributes:nil error:nil];
+        [man createDirectoryAtPath:cache
+       withIntermediateDirectories:YES
+                        attributes:nil
+                             error:nil];
     }
 }
 

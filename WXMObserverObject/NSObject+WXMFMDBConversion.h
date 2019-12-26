@@ -15,10 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - 公用方法
 
 /** 字典->模型 */
-+ (instancetype)wxm_modelWithKeyValue:(NSDictionary *)dictionary;
++ (instancetype)wf_modelWithKeyValue:(NSDictionary *)dictionary;
 
 /** 模型->字典 */
-- (NSDictionary *)wxm_modelToKeyValue;
+- (NSDictionary *)wf_modelToKeyValue;
 
 @end
 

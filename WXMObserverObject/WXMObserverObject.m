@@ -24,9 +24,15 @@
 - (void)listeningAllProperty {
     [self removeAllProperty];
     [self.attributeArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
+        
         if (obj.length <= 0) return;
         @try {
-            [self addObserver:self forKeyPath:obj options:NSKeyValueObservingOptionNew context:nil];
+            
+            [self addObserver:self
+                   forKeyPath:obj
+                      options:NSKeyValueObservingOptionNew
+                      context:nil];
+            
         } @catch (NSException *exception) {} @finally {}
     }];
 }
@@ -47,17 +53,17 @@
                         change:(NSDictionary *)change
                        context:(void *)context {
     if ([self.attributeArray containsObject:keyPath]) {
-        [self wxm_parametersChange];
+        [self wf_parametersChange];
     }
 }
 
 /** 参数变化调用 */
-- (void)wxm_parametersChange {
+- (void)wf_parametersChange {
     NSLog(@"%@",@"有参数变化");
 }
 
 /** 获取所有属性 */
-+ (NSArray *)wxm_getFropertys {
++ (NSArray *)wf_getFropertys {
     @try {
         unsigned int count = 0;
         NSMutableArray *_arrayM = @[].mutableCopy;
@@ -81,7 +87,7 @@
 
 - (NSMutableArray<NSString *> *)attributeArray {
     if (!_attributeArray) {
-        _attributeArray = [[self class] wxm_getFropertys].mutableCopy;
+        _attributeArray = [[self class] wf_getFropertys].mutableCopy;
     }
     return _attributeArray;
 }
