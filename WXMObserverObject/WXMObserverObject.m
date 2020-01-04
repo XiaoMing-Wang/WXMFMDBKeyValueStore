@@ -24,6 +24,7 @@
 - (void)listeningAllProperty {
     [self removeAllProperty];
     [self.attributeArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
+        
         if (obj.length <= 0) return;
         
         @try {
