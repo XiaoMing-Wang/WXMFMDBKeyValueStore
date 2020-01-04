@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface WXMObserverObject : NSObject
 
 /** 参数变化调用函数 */
-- (void)wxm_parametersChange;
+- (void)wf_parametersChange;
 
 @end
 

@@ -17,7 +17,7 @@
 
 #define KLibraryboxPath \
 NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject
-#define PATH_OF_DOCUMENT [KLibraryboxPath stringByAppendingPathComponent:@"USER_DATA_CACHE"]
+#define PATH_OF_DOCUMENT [KLibraryboxPath stringByAppendingPathComponent:@"USERDATABASE"]
 
 #import "WXMFMDBBaseKeyValueStore.h"
 #import "FMDatabase.h"
@@ -82,12 +82,15 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 /************************ 数据库操作 *****************************************/
 
 + (void)load {
-    NSFileManager* man = [NSFileManager defaultManager];
+    NSFileManager* manager = [NSFileManager defaultManager];
     NSString *cache = PATH_OF_DOCUMENT;
     BOOL isDir = NO;
-    BOOL isExists = [man fileExistsAtPath:cache isDirectory:&isDir];
+    BOOL isExists = [manager fileExistsAtPath:cache isDirectory:&isDir];
     if (!isExists || !isDir) {
-        [man createDirectoryAtPath:cache withIntermediateDirectories:YES attributes:nil error:nil];
+        [manager createDirectoryAtPath:cache
+           withIntermediateDirectories:YES
+                            attributes:nil
+                                 error:nil];
     }
 }
 
@@ -97,7 +100,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 - (id)initDBWithName:(NSString *)dbName {
     if (self = [super init]) {
-        NSString * dbPath = [PATH_OF_DOCUMENT stringByAppendingPathComponent:dbName];
+        NSString *dbPath = [PATH_OF_DOCUMENT stringByAppendingPathComponent:dbName];
         if (_dbQueue) [self close];
         _dbQueue = [FMDatabaseQueue databaseQueueWithPath:dbPath];
         debugLog(@"dbPath = %@", dbPath);
@@ -218,7 +221,10 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     
     if (json) {
         NSError * error;
-        id result = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding] options:(NSJSONReadingAllowFragments) error:&error];
+        id result = [NSJSONSerialization
+                     JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
+                     options:(NSJSONReadingAllowFragments)
+                     error:&error];
         if (error) {
             debugLog(@"ERROR, faild to prase to json");
             return nil;

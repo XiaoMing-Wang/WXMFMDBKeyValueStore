@@ -12,10 +12,8 @@
 
 typedef NSString *WXMFMDBTableType NS_STRING_ENUM;
 
+/** 存储JSON需要表名  存储model以model class作为表名 */
 /******************************** 表名 ********************************/
-
-static WXMFMDBTableType const CUSTOM_CLASS = @"CUSTOM_CLASS";            /* model */
-
 
 static WXMFMDBTableType const USER_INFORMATION = @"USER_INFORMATION";    /* 用户列表 */
 static WXMFMDBTableType const USER_LIMITS = @"USER_LIMITS";              /* 权限 */

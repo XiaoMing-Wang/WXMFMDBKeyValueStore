@@ -41,10 +41,11 @@
 
 + (void)saveCustomModelWithObject:(NSObject *)object {
     NSAssert([self judgeExsitUserID], @"请设置userID");
+    if (!object) return;
     
     @try {
         NSString *tableName = NSStringFromClass([object class]);
-        NSDictionary *dictionary = [object wxm_modelToKeyValue];
+        NSDictionary *dictionary = [object wf_modelToKeyValue];
         [self saveAssembleWithAssemble:dictionary fromTable:tableName];
     } @catch (NSException *exception) {} @finally {}
 }
@@ -55,7 +56,7 @@
     @try {
         id dictionary = [self getAssembleWithTable:NSStringFromClass(aClass)];
         if ([dictionary isKindOfClass:[NSDictionary class]]) {
-            return [aClass wxm_modelWithKeyValue:dictionary];
+            return [aClass wf_modelWithKeyValue:dictionary];
         }
     } @catch (NSException *exception) {} @finally {}
     
