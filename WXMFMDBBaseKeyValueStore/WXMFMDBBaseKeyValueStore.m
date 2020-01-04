@@ -23,7 +23,6 @@ NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).f
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 #import "FMDatabaseQueue.h"
-#import "NSObject+WXMFMDBConversion.h"
 
 @implementation WXMKeyValueItem @end
 @interface WXMFMDBBaseKeyValueStore()

@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (id)wf_getCustomModelWithClass:(Class)aClass;
 
 /** json */
-+ (void)wf_saveAssembleWithObject:(id<NSCoding>)object instanceType:(WXMFMDBTableType)instanceType;
++ (void)wf_saveAssembleWithObject:(id)object instanceType:(WXMFMDBTableType)instanceType;
 + (id)wf_getAssembleWithInstanceType:(WXMFMDBTableType)instanceType;
 @end
 

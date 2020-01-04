@@ -5,9 +5,8 @@
 //  Created by edz on 2019/6/27.
 //  Copyright © 2019 wq. All rights reserved.
 //
-
+#import "NSObject+WXMFMDBModel.h"
 #import "WXMFMDBWrapKeyValueStore.h"
-#import "NSObject+WXMFMDBConversion.h"
 
 @interface WXMFMDBWrapKeyValueStore ()
 @property (nonatomic, strong, readwrite) NSString *userID;
@@ -45,7 +44,7 @@
     
     @try {
         NSString *tableName = NSStringFromClass([object class]);
-        NSDictionary *dictionary = [object wf_modelToKeyValue];
+        NSDictionary *dictionary = [object modelToJSONObject];
         [self saveAssembleWithAssemble:dictionary fromTable:tableName];
     } @catch (NSException *exception) {} @finally {}
 }
@@ -56,7 +55,7 @@
     @try {
         id dictionary = [self getAssembleWithTable:NSStringFromClass(aClass)];
         if ([dictionary isKindOfClass:[NSDictionary class]]) {
-            return [aClass wf_modelWithKeyValue:dictionary];
+            return [aClass modelWithDictionary:dictionary];
         }
     } @catch (NSException *exception) {} @finally {}
     

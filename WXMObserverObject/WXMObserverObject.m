@@ -6,8 +6,8 @@
 //  Copyright © 2019 wq. All rights reserved.
 //
 
-#import "WXMObserverObject.h"
 #import <objc/runtime.h>
+#import "WXMObserverObject.h"
 
 @interface WXMObserverObject ()
 @property (nonatomic, strong) NSMutableArray<NSString *> *attributeArray;
@@ -24,16 +24,12 @@
 - (void)listeningAllProperty {
     [self removeAllProperty];
     [self.attributeArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
-        
         if (obj.length <= 0) return;
-        
         @try {
-            
             [self addObserver:self
                    forKeyPath:obj
                       options:NSKeyValueObservingOptionNew
                       context:nil];
-            
         } @catch (NSException *exception) {} @finally {}
     }];
 }
@@ -53,9 +49,7 @@
                       ofObject:(id)object
                         change:(NSDictionary *)change
                        context:(void *)context {
-    if ([self.attributeArray containsObject:keyPath]) {
-        [self wf_parametersChange];
-    }
+    if ([self.attributeArray containsObject:keyPath]) [self wf_parametersChange];
 }
 
 /** 参数变化调用 */
@@ -79,17 +73,17 @@
     } @catch (NSException *exception) {} @finally {}
 }
 
-- (void)dealloc {
-    @try {
-        [self removeAllProperty];
-    } @catch (NSException *exception) {} @finally {}
-    NSLog(@"%@被释放",NSStringFromClass(self.class));
-}
-
 - (NSMutableArray<NSString *> *)attributeArray {
     if (!_attributeArray) {
         _attributeArray = [[self class] wf_getFropertys].mutableCopy;
     }
     return _attributeArray;
+}
+
+- (void)dealloc {
+    @try {
+        [self removeAllProperty];
+    } @catch (NSException *exception) {} @finally {}
+    NSLog(@"%@被释放",NSStringFromClass(self.class));
 }
 @end
