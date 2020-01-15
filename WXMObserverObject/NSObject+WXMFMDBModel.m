@@ -10,12 +10,10 @@
 //
 
 #import "NSObject+WXMFMDBModel.h"
-#import "WXMFMDBClassInfo.h"
 #import <objc/message.h>
 
 #define force_inline __inline__ __attribute__((always_inline))
 
-/// Foundation Class Type
 typedef NS_ENUM (NSUInteger, WXMFMDBEncodingNSType) {
     WXMFMDBEncodingTypeNSUnknown = 0,
     WXMFMDBEncodingTypeNSString,
@@ -35,7 +33,6 @@ typedef NS_ENUM (NSUInteger, WXMFMDBEncodingNSType) {
     WXMFMDBEncodingTypeNSMutableSet,
 };
 
-/// Get the Foundation class type from property info.
 static force_inline WXMFMDBEncodingNSType WXMFMDBClassGetNSType(Class cls) {
     if (!cls) return WXMFMDBEncodingTypeNSUnknown;
     if ([cls isSubclassOfClass:[NSMutableString class]]) return WXMFMDBEncodingTypeNSMutableString;
@@ -56,7 +53,6 @@ static force_inline WXMFMDBEncodingNSType WXMFMDBClassGetNSType(Class cls) {
     return WXMFMDBEncodingTypeNSUnknown;
 }
 
-/// Whether the type is c number.
 static force_inline BOOL WXMFMDBEncodingTypeIsCNumber(WXMFMDBEncodingType type) {
     switch (type & WXMFMDBEncodingTypeMask) {
         case WXMFMDBEncodingTypeBool:
@@ -75,7 +71,6 @@ static force_inline BOOL WXMFMDBEncodingTypeIsCNumber(WXMFMDBEncodingType type) 
     }
 }
 
-/// Parse a number value from 'id'.
 static force_inline NSNumber *WXMFMDBNSNumberCreateFromID(__unsafe_unretained id value) {
     static NSCharacterSet *dot;
     static NSDictionary *dic;
@@ -131,7 +126,6 @@ static force_inline NSNumber *WXMFMDBNSNumberCreateFromID(__unsafe_unretained id
     return nil;
 }
 
-/// Parse string to date.
 static force_inline NSDate *WXMFMDBNSDateFromString(__unsafe_unretained NSString *string) {
     typedef NSDate* (^WXMFMDBNSDateParseBlock)(NSString *string);
     #define kParserNum 34
@@ -139,42 +133,35 @@ static force_inline NSDate *WXMFMDBNSDateFromString(__unsafe_unretained NSString
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         {
-            /*
-             2014-01-20  // Google
-             */
+            /**  2014-01-20 */
             NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
             formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            formatter.dateFormat = @"yyyy-MM-dd";
+            formatter.dateFormat = @"yyWXMFMDB-MM-dd";
             blocks[10] = ^(NSString *string) { return [formatter dateFromString:string]; };
         }
         
         {
-            /*
-             2014-01-20 12:24:48
-             2014-01-20T12:24:48   // Google
-             2014-01-20 12:24:48.000
-             2014-01-20T12:24:48.000
-             */
+            /**  2014-01-20T12:24:48 */
             NSDateFormatter *formatter1 = [[NSDateFormatter alloc] init];
             formatter1.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter1.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            formatter1.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss";
+            formatter1.dateFormat = @"yyWXMFMDB-MM-dd'T'HH:mm:ss";
             
             NSDateFormatter *formatter2 = [[NSDateFormatter alloc] init];
             formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter2.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            formatter2.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+            formatter2.dateFormat = @"yyWXMFMDB-MM-dd HH:mm:ss";
 
             NSDateFormatter *formatter3 = [[NSDateFormatter alloc] init];
             formatter3.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter3.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            formatter3.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSS";
+            formatter3.dateFormat = @"yyWXMFMDB-MM-dd'T'HH:mm:ss.SSS";
 
             NSDateFormatter *formatter4 = [[NSDateFormatter alloc] init];
             formatter4.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
             formatter4.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            formatter4.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS";
+            formatter4.dateFormat = @"yyWXMFMDB-MM-dd HH:mm:ss.SSS";
             
             blocks[19] = ^(NSString *string) {
                 if ([string characterAtIndex:10] == 'T') {
@@ -194,21 +181,16 @@ static force_inline NSDate *WXMFMDBNSDateFromString(__unsafe_unretained NSString
         }
         
         {
-            /*
-             2014-01-20T12:24:48Z        // Github, Apple
-             2014-01-20T12:24:48+0800    // Facebook
-             2014-01-20T12:24:48+12:00   // Google
-             2014-01-20T12:24:48.000Z
-             2014-01-20T12:24:48.000+0800
-             2014-01-20T12:24:48.000+12:00
-             */
+            /**  2014-01-20T12:24:48Z */
+            /**  2014-01-20T12:24:48+0800 */
+            /**  2014-01-20T12:24:48+12:00 */
             NSDateFormatter *formatter = [NSDateFormatter new];
             formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-            formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+            formatter.dateFormat = @"yyWXMFMDB-MM-dd'T'HH:mm:ssZ";
 
             NSDateFormatter *formatter2 = [NSDateFormatter new];
             formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-            formatter2.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+            formatter2.dateFormat = @"yyWXMFMDB-MM-dd'T'HH:mm:ss.SSSZ";
 
             blocks[20] = ^(NSString *string) { return [formatter dateFromString:string]; };
             blocks[24] = ^(NSString *string) { return [formatter dateFromString:string]?: [formatter2 dateFromString:string]; };
@@ -218,17 +200,14 @@ static force_inline NSDate *WXMFMDBNSDateFromString(__unsafe_unretained NSString
         }
         
         {
-            /*
-             Fri Sep 04 00:12:21 +0800 2015 // Weibo, Twitter
-             Fri Sep 04 00:12:21.000 +0800 2015
-             */
+            /**  Fri Sep 04 00:12:21 +0800 2015 */
             NSDateFormatter *formatter = [NSDateFormatter new];
             formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-            formatter.dateFormat = @"EEE MMM dd HH:mm:ss Z yyyy";
+            formatter.dateFormat = @"EEE MMM dd HH:mm:ss Z yyWXMFMDB";
 
             NSDateFormatter *formatter2 = [NSDateFormatter new];
             formatter2.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-            formatter2.dateFormat = @"EEE MMM dd HH:mm:ss.SSS Z yyyy";
+            formatter2.dateFormat = @"EEE MMM dd HH:mm:ss.SSS Z yyWXMFMDB";
 
             blocks[30] = ^(NSString *string) { return [formatter dateFromString:string]; };
             blocks[34] = ^(NSString *string) { return [formatter2 dateFromString:string]; };
@@ -243,7 +222,6 @@ static force_inline NSDate *WXMFMDBNSDateFromString(__unsafe_unretained NSString
 }
 
 
-/// Get the 'NSBlock' class.
 static force_inline Class WXMFMDBNSBlockClass() {
     static Class cls;
     static dispatch_once_t onceToken;
@@ -254,34 +232,22 @@ static force_inline Class WXMFMDBNSBlockClass() {
             cls = class_getSuperclass(cls);
         }
     });
-    return cls; // current is "NSBlock"
+    return cls;
 }
 
 
 
-/**
- Get the ISO date formatter.
- 
- ISO8601 format example:
- 2010-07-09T16:13:30+12:00
- 2011-01-11T11:11:11+0000
- 2011-01-26T19:06:43Z
- 
- length: 20/24/25
- */
 static force_inline NSDateFormatter *WXMFMDBISODateFormatter() {
     static NSDateFormatter *formatter = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         formatter = [[NSDateFormatter alloc] init];
         formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-        formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+        formatter.dateFormat = @"yyWXMFMDB-MM-dd'T'HH:mm:ssZ";
     });
     return formatter;
 }
 
-/// Get the value with key paths from dictionary
-/// The dic should be NSDictionary, and the keyPath should not be nil.
 static force_inline id WXMFMDBValueForKeyPath(__unsafe_unretained NSDictionary *dic, __unsafe_unretained NSArray *keyPaths) {
     id value = nil;
     for (NSUInteger i = 0, max = keyPaths.count; i < max; i++) {
@@ -297,8 +263,6 @@ static force_inline id WXMFMDBValueForKeyPath(__unsafe_unretained NSDictionary *
     return value;
 }
 
-/// Get the value with multi key (or key path) from dictionary
-/// The dic should be NSDictionary
 static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary *dic, __unsafe_unretained NSArray *multiKeys) {
     id value = nil;
     for (NSString *key in multiKeys) {
@@ -316,31 +280,25 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
 
 
 
-/// A property info in object model.
 @interface _WXMFMDBModelPropertyMeta : NSObject {
     @package
-    NSString *_name;             ///< property's name
-    WXMFMDBEncodingType _type;        ///< property's type
-    WXMFMDBEncodingNSType _nsType;    ///< property's Foundation type
-    BOOL _isCNumber;             ///< is c number type
-    Class _cls;                  ///< property's class, or nil
-    Class _genericCls;           ///< container's generic class, or nil if threr's no generic class
-    SEL _getter;                 ///< getter, or nil if the instances cannot respond
-    SEL _setter;                 ///< setter, or nil if the instances cannot respond
-    BOOL _isKVCCompatible;       ///< YES if it can access with key-value coding
-    BOOL _isStructAvailableForKeyedArchiver; ///< YES if the struct can encoded with keyed archiver/unarchiver
-    BOOL _hasCustomClassFromDictionary; ///< class/generic class implements +modelCustomClassForDictionary:
+    NSString *_name;
+    WXMFMDBEncodingType _type;
+    WXMFMDBEncodingNSType _nsType;
+    BOOL _isCNumber;
+    Class _cls;
+    Class _genericCls;
+    SEL _getter;
+    SEL _setter;
+    BOOL _isKVCCompatible;      
+    BOOL _isStructAvailableForKeyedArchiver;
+    BOOL _hasCustomClassFromDictionary;
     
-    /*
-     property->key:       _mappedToKey:key     _mappedToKeyPath:nil            _mappedToKeyArray:nil
-     property->keyPath:   _mappedToKey:keyPath _mappedToKeyPath:keyPath(array) _mappedToKeyArray:nil
-     property->keys:      _mappedToKey:keys[0] _mappedToKeyPath:nil/keyPath    _mappedToKeyArray:keys(array)
-     */
-    NSString *_mappedToKey;      ///< the key mapped to
-    NSArray *_mappedToKeyPath;   ///< the key path mapped to (nil if the name is not key path)
-    NSArray *_mappedToKeyArray;  ///< the key(NSString) or keyPath(NSArray) array (nil if not mapped to multiple keys)
-    WXMFMDBClassPropertyInfo *_info;  ///< property's info
-    _WXMFMDBModelPropertyMeta *_next; ///< next meta if there are multiple properties mapped to the same key.
+    NSString *_mappedToKey;
+    NSArray *_mappedToKeyPath;
+    NSArray *_mappedToKeyArray;
+    WXMFMDBClassPropertyInfo *_info;
+    _WXMFMDBModelPropertyMeta *_next;
 }
 @end
 
@@ -358,21 +316,16 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
         meta->_isCNumber = WXMFMDBEncodingTypeIsCNumber(meta->_type);
     }
     if ((meta->_type & WXMFMDBEncodingTypeMask) == WXMFMDBEncodingTypeStruct) {
-        /*
-         It seems that NSKeyedUnarchiver cannot decode NSValue except these structs:
-         */
         static NSSet *types = nil;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
             NSMutableSet *set = [NSMutableSet new];
-            // 32 bit
             [set addObject:@"{CGSize=ff}"];
             [set addObject:@"{CGPoint=ff}"];
             [set addObject:@"{CGRect={CGPoint=ff}{CGSize=ff}}"];
             [set addObject:@"{CGAffineTransform=ffffff}"];
             [set addObject:@"{UIEdgeInsets=ffff}"];
             [set addObject:@"{UIOffset=ff}"];
-            // 64 bit
             [set addObject:@"{CGSize=dd}"];
             [set addObject:@"{CGPoint=dd}"];
             [set addObject:@"{CGRect={CGPoint=dd}{CGSize=dd}}"];
@@ -405,11 +358,6 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
     }
     
     if (meta->_getter && meta->_setter) {
-        /*
-         KVC invalid type:
-         long double
-         pointer (such as SEL/CoreFoundation object)
-         */
         switch (meta->_type & WXMFMDBEncodingTypeMask) {
             case WXMFMDBEncodingTypeBool:
             case WXMFMDBEncodingTypeInt8:
@@ -438,21 +386,14 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
 @end
 
 
-/// A class info in object model.
 @interface _WXMFMDBModelMeta : NSObject {
     @package
     WXMFMDBClassInfo *_classInfo;
-    /// Key:mapped key and key path, Value:_WXMFMDBModelPropertyInfo.
     NSDictionary *_mapper;
-    /// Array<_WXMFMDBModelPropertyMeta>, all property meta of this model.
     NSArray *_allPropertyMetas;
-    /// Array<_WXMFMDBModelPropertyMeta>, property meta which is mapped to a key path.
     NSArray *_keyPathPropertyMetas;
-    /// Array<_WXMFMDBModelPropertyMeta>, property meta which is mapped to multi keys.
     NSArray *_multiKeysPropertyMetas;
-    /// The number of mapped key (and key path), same to _mapper.count.
     NSUInteger _keyMappedCount;
-    /// Model class type.
     WXMFMDBEncodingNSType _nsType;
     
     BOOL _hasCustomWillTransformFromDictionary;
@@ -468,7 +409,6 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
     if (!classInfo) return nil;
     self = [super init];
     
-    // Get black list
     NSSet *blacklist = nil;
     if ([cls respondsToSelector:@selector(modelPropertyBlacklist)]) {
         NSArray *properties = [(id<WXMFMDBModel>)cls modelPropertyBlacklist];
@@ -477,7 +417,6 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
         }
     }
     
-    // Get white list
     NSSet *whitelist = nil;
     if ([cls respondsToSelector:@selector(modelPropertyWhitelist)]) {
         NSArray *properties = [(id<WXMFMDBModel>)cls modelPropertyWhitelist];
@@ -486,7 +425,6 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
         }
     }
     
-    // Get container property's generic class
     NSDictionary *genericMapper = nil;
     if ([cls respondsToSelector:@selector(modelContainerPropertyGenericClass)]) {
         genericMapper = [(id<WXMFMDBModel>)cls modelContainerPropertyGenericClass];
@@ -509,10 +447,9 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
         }
     }
     
-    // Create all property metas.
     NSMutableDictionary *allPropertyMetas = [NSMutableDictionary new];
     WXMFMDBClassInfo *curClassInfo = classInfo;
-    while (curClassInfo && curClassInfo.superCls != nil) { // recursive parse super class, but ignore root class (NSObject/NSProxy)
+    while (curClassInfo && curClassInfo.superCls != nil) {
         for (WXMFMDBClassPropertyInfo *propertyInfo in curClassInfo.propertyInfos.allValues) {
             if (!propertyInfo.name) continue;
             if (blacklist && [blacklist containsObject:propertyInfo.name]) continue;
@@ -529,7 +466,6 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
     }
     if (allPropertyMetas.count) _allPropertyMetas = allPropertyMetas.allValues.copy;
     
-    // create mapper
     NSMutableDictionary *mapper = [NSMutableDictionary new];
     NSMutableArray *keyPathPropertyMetas = [NSMutableArray new];
     NSMutableArray *multiKeysPropertyMetas = [NSMutableArray new];
@@ -604,7 +540,6 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
     return self;
 }
 
-/// Returns the cached model class meta
 + (instancetype)metaWithClass:(Class)cls {
     if (!cls) return nil;
     static CFMutableDictionaryRef cache;
@@ -631,13 +566,6 @@ static force_inline id WXMFMDBValueForMultiKeys(__unsafe_unretained NSDictionary
 @end
 
 
-/**
- Get number from property.
- @discussion Caller should hold strong reference to the parameters before this function returns.
- @param model Should not be nil.
- @param meta  Should not be nil, meta.isCNumber should be YES, meta.getter should not be nil.
- @return A number object, or nil if failed.
- */
 static force_inline NSNumber *ModelCreateNumberFromProperty(__unsafe_unretained id model,
                                                             __unsafe_unretained _WXMFMDBModelPropertyMeta *meta) {
     switch (meta->_type & WXMFMDBEncodingTypeMask) {
@@ -687,13 +615,6 @@ static force_inline NSNumber *ModelCreateNumberFromProperty(__unsafe_unretained 
     }
 }
 
-/**
- Set number to property.
- @discussion Caller should hold strong reference to the parameters before this function returns.
- @param model Should not be nil.
- @param num   Can be nil.
- @param meta  Should not be nil, meta.isCNumber should be YES, meta.setter should not be nil.
- */
 static force_inline void ModelSetNumberToProperty(__unsafe_unretained id model,
                                                   __unsafe_unretained NSNumber *num,
                                                   __unsafe_unretained _WXMFMDBModelPropertyMeta *meta) {
@@ -747,27 +668,18 @@ static force_inline void ModelSetNumberToProperty(__unsafe_unretained id model,
             long double d = num.doubleValue;
             if (isnan(d) || isinf(d)) d = 0;
             ((void (*)(id, SEL, long double))(void *) objc_msgSend)((id)model, meta->_setter, (long double)d);
-        } // break; commented for code coverage in next line
+        }
         default: break;
     }
 }
 
-/**
- Set value to model with a property meta.
- 
- @discussion Caller should hold strong reference to the parameters before this function returns.
- 
- @param model Should not be nil.
- @param value Should not be nil, but can be NSNull.
- @param meta  Should not be nil, and meta->_setter should not be nil.
- */
 static void ModelSetValueForProperty(__unsafe_unretained id model,
                                      __unsafe_unretained id value,
                                      __unsafe_unretained _WXMFMDBModelPropertyMeta *meta) {
     if (meta->_isCNumber) {
         NSNumber *num = WXMFMDBNSNumberCreateFromID(value);
         ModelSetNumberToProperty(model, num, meta);
-        if (num) [num class]; // hold the number
+        if (num) [num class];
     } else if (meta->_nsType) {
         if (value == (id)kCFNull) {
             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, (id)nil);
@@ -820,11 +732,11 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                             NSDecimalNumber *decNum = [NSDecimalNumber decimalNumberWithString:value];
                             NSDecimal dec = decNum.decimalValue;
                             if (dec._length == 0 && dec._isNegative) {
-                                decNum = nil; // NaN
+                                decNum = nil;
                             }
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, decNum);
                         }
-                    } else { // WXMFMDBEncodingTypeNSValue
+                    } else {
                         if ([value isKindOfClass:[NSValue class]]) {
                             ((void (*)(id, SEL, id))(void *) objc_msgSend)((id)model, meta->_setter, value);
                         }
@@ -886,7 +798,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                     Class cls = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
                                         cls = [cls modelCustomClassForDictionary:one];
-                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
+                                        if (!cls) cls = meta->_genericCls;
                                     }
                                     NSObject *newOne = [cls new];
                                     [newOne modelSetWithDictionary:one];
@@ -926,7 +838,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                     Class cls = meta->_genericCls;
                                     if (meta->_hasCustomClassFromDictionary) {
                                         cls = [cls modelCustomClassForDictionary:oneValue];
-                                        if (!cls) cls = meta->_genericCls; // for xcode code coverage
+                                        if (!cls) cls = meta->_genericCls;
                                     }
                                     NSObject *newOne = [cls new];
                                     [newOne modelSetWithDictionary:(id)oneValue];
@@ -961,7 +873,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                 Class cls = meta->_genericCls;
                                 if (meta->_hasCustomClassFromDictionary) {
                                     cls = [cls modelCustomClassForDictionary:one];
-                                    if (!cls) cls = meta->_genericCls; // for xcode code coverage
+                                    if (!cls) cls = meta->_genericCls;
                                 }
                                 NSObject *newOne = [cls new];
                                 [newOne modelSetWithDictionary:one];
@@ -978,7 +890,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                                                                            ((NSSet *)valueSet).mutableCopy);
                         }
                     }
-                } // break; commented for code coverage in next line
+                }
                     
                 default: break;
             }
@@ -1002,7 +914,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         Class cls = meta->_cls;
                         if (meta->_hasCustomClassFromDictionary) {
                             cls = [cls modelCustomClassForDictionary:value];
-                            if (!cls) cls = meta->_genericCls; // for xcode code coverage
+                            if (!cls) cls = meta->_genericCls;
                         }
                         one = [cls new];
                         [one modelSetWithDictionary:value];
@@ -1071,7 +983,7 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
                         ((void (*)(id, SEL, void *))(void *) objc_msgSend)((id)model, meta->_setter, nsValue.pointerValue);
                     }
                 }
-            } // break; commented for code coverage in next line
+            }
                 
             default: break;
         }
@@ -1080,18 +992,11 @@ static void ModelSetValueForProperty(__unsafe_unretained id model,
 
 
 typedef struct {
-    void *modelMeta;  ///< _WXMFMDBModelMeta
-    void *model;      ///< id (self)
-    void *dictionary; ///< NSDictionary (json)
+    void *modelMeta;
+    void *model;
+    void *dictionary;
 } ModelSetContext;
 
-/**
- Apply function for dictionary, to set the key-value pair to model.
- 
- @param _key     should not be nil, NSString.
- @param _value   should not be nil.
- @param _context _context.modelMeta and _context.model should not be nil.
- */
 static void ModelSetWithDictionaryFunction(const void *_key, const void *_value, void *_context) {
     ModelSetContext *context = _context;
     __unsafe_unretained _WXMFMDBModelMeta *meta = (__bridge _WXMFMDBModelMeta *)(context->modelMeta);
@@ -1105,12 +1010,6 @@ static void ModelSetWithDictionaryFunction(const void *_key, const void *_value,
     };
 }
 
-/**
- Apply function for model property meta, to set dictionary to model.
- 
- @param _propertyMeta should not be nil, _WXMFMDBModelPropertyMeta.
- @param _context      _context.model and _context.dictionary should not be nil.
- */
 static void ModelSetWithPropertyMetaArrayFunction(const void *_propertyMeta, void *_context) {
     ModelSetContext *context = _context;
     __unsafe_unretained NSDictionary *dictionary = (__bridge NSDictionary *)(context->dictionary);
@@ -1132,13 +1031,6 @@ static void ModelSetWithPropertyMetaArrayFunction(const void *_propertyMeta, voi
     }
 }
 
-/**
- Returns a valid JSON object (NSArray/NSDictionary/NSString/NSNumber/NSNull), 
- or nil if an error occurs.
- 
- @param model Model, can be nil.
- @return JSON object, nil if an error occurs.
- */
 static id ModelToJSONObjectRecursive(NSObject *model) {
     if (!model || model == (id)kCFNull) return model;
     if ([model isKindOfClass:[NSString class]]) return model;
@@ -1191,7 +1083,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     _WXMFMDBModelMeta *modelMeta = [_WXMFMDBModelMeta metaWithClass:[model class]];
     if (!modelMeta || modelMeta->_keyMappedCount == 0) return nil;
     NSMutableDictionary *result = [[NSMutableDictionary alloc] initWithCapacity:64];
-    __unsafe_unretained NSMutableDictionary *dic = result; // avoid retain and release in block
+    __unsafe_unretained NSMutableDictionary *dic = result;
     [modelMeta->_mapper enumerateKeysAndObjectsUsingBlock:^(NSString *propertyMappedKey, _WXMFMDBModelPropertyMeta *propertyMeta, BOOL *stop) {
         if (!propertyMeta->_getter) return;
         
@@ -1226,7 +1118,7 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
             NSMutableDictionary *subDic = nil;
             for (NSUInteger i = 0, max = propertyMeta->_mappedToKeyPath.count; i < max; i++) {
                 NSString *key = propertyMeta->_mappedToKeyPath[i];
-                if (i + 1 == max) { // end
+                if (i + 1 == max) {
                     if (!superDic[key]) superDic[key] = value;
                     break;
                 }
@@ -1260,7 +1152,6 @@ static id ModelToJSONObjectRecursive(NSObject *model) {
     return result;
 }
 
-/// Add indent to string (exclude first line)
 static NSMutableString *ModelDescriptionAddIndent(NSMutableString *desc, NSUInteger indent) {
     for (NSUInteger i = 0, max = desc.length; i < max; i++) {
         unichar c = [desc characterAtIndex:i];
@@ -1275,7 +1166,6 @@ static NSMutableString *ModelDescriptionAddIndent(NSMutableString *desc, NSUInte
     return desc;
 }
 
-/// Generaate a description string
 static NSString *ModelDescription(NSObject *model) {
     static const int kDescMaxLength = 100;
     if (!model) return @"<nil>";
@@ -1308,7 +1198,7 @@ static NSString *ModelDescription(NSObject *model) {
             
         case WXMFMDBEncodingTypeNSSet: case WXMFMDBEncodingTypeNSMutableSet: {
             model = ((NSSet *)model).allObjects;
-        } // no break
+        }
             
         case WXMFMDBEncodingTypeNSArray: case WXMFMDBEncodingTypeNSMutableArray: {
             NSArray *array = (id)model;
@@ -1353,7 +1243,6 @@ static NSString *ModelDescription(NSObject *model) {
             [desc appendFormat:@"<%@: %p>", model.class, model];
             if (modelMeta->_allPropertyMetas.count == 0) return desc;
             
-            // sort property names
             NSArray *properties = [modelMeta->_allPropertyMetas
                                    sortedArrayUsingComparator:^NSComparisonResult(_WXMFMDBModelPropertyMeta *p1, _WXMFMDBModelPropertyMeta *p2) {
                                        return [p1->_name compare:p2->_name];
@@ -1408,6 +1297,342 @@ static NSString *ModelDescription(NSObject *model) {
         }
     }
 }
+
+WXMFMDBEncodingType WXMFMDBEncodingGetType(const char *typeEncoding) {
+    char *type = (char *)typeEncoding;
+    if (!type) return WXMFMDBEncodingTypeUnknown;
+    size_t len = strlen(type);
+    if (len == 0) return WXMFMDBEncodingTypeUnknown;
+    
+    WXMFMDBEncodingType qualifier = 0;
+    bool prefix = true;
+    while (prefix) {
+        switch (*type) {
+            case 'r': {
+                qualifier |= WXMFMDBEncodingTypeQualifierConst;
+                type++;
+            } break;
+            case 'n': {
+                qualifier |= WXMFMDBEncodingTypeQualifierIn;
+                type++;
+            } break;
+            case 'N': {
+                qualifier |= WXMFMDBEncodingTypeQualifierInout;
+                type++;
+            } break;
+            case 'o': {
+                qualifier |= WXMFMDBEncodingTypeQualifierOut;
+                type++;
+            } break;
+            case 'O': {
+                qualifier |= WXMFMDBEncodingTypeQualifierBycopy;
+                type++;
+            } break;
+            case 'R': {
+                qualifier |= WXMFMDBEncodingTypeQualifierByref;
+                type++;
+            } break;
+            case 'V': {
+                qualifier |= WXMFMDBEncodingTypeQualifierOneway;
+                type++;
+            } break;
+            default: { prefix = false; } break;
+        }
+    }
+
+    len = strlen(type);
+    if (len == 0) return WXMFMDBEncodingTypeUnknown | qualifier;
+
+    switch (*type) {
+        case 'v': return WXMFMDBEncodingTypeVoid | qualifier;
+        case 'B': return WXMFMDBEncodingTypeBool | qualifier;
+        case 'c': return WXMFMDBEncodingTypeInt8 | qualifier;
+        case 'C': return WXMFMDBEncodingTypeUInt8 | qualifier;
+        case 's': return WXMFMDBEncodingTypeInt16 | qualifier;
+        case 'S': return WXMFMDBEncodingTypeUInt16 | qualifier;
+        case 'i': return WXMFMDBEncodingTypeInt32 | qualifier;
+        case 'I': return WXMFMDBEncodingTypeUInt32 | qualifier;
+        case 'l': return WXMFMDBEncodingTypeInt32 | qualifier;
+        case 'L': return WXMFMDBEncodingTypeUInt32 | qualifier;
+        case 'q': return WXMFMDBEncodingTypeInt64 | qualifier;
+        case 'Q': return WXMFMDBEncodingTypeUInt64 | qualifier;
+        case 'f': return WXMFMDBEncodingTypeFloat | qualifier;
+        case 'd': return WXMFMDBEncodingTypeDouble | qualifier;
+        case 'D': return WXMFMDBEncodingTypeLongDouble | qualifier;
+        case '#': return WXMFMDBEncodingTypeClass | qualifier;
+        case ':': return WXMFMDBEncodingTypeSEL | qualifier;
+        case '*': return WXMFMDBEncodingTypeCString | qualifier;
+        case '^': return WXMFMDBEncodingTypePointer | qualifier;
+        case '[': return WXMFMDBEncodingTypeCArray | qualifier;
+        case '(': return WXMFMDBEncodingTypeUnion | qualifier;
+        case '{': return WXMFMDBEncodingTypeStruct | qualifier;
+        case '@': {
+            if (len == 2 && *(type + 1) == '?')
+                return WXMFMDBEncodingTypeBlock | qualifier;
+            else
+                return WXMFMDBEncodingTypeObject | qualifier;
+        }
+        default: return WXMFMDBEncodingTypeUnknown | qualifier;
+    }
+}
+
+@implementation WXMFMDBClassIvarInfo
+
+- (instancetype)initWithIvar:(Ivar)ivar {
+    if (!ivar) return nil;
+    self = [super init];
+    _ivar = ivar;
+    const char *name = ivar_getName(ivar);
+    if (name) {
+        _name = [NSString stringWithUTF8String:name];
+    }
+    _offset = ivar_getOffset(ivar);
+    const char *typeEncoding = ivar_getTypeEncoding(ivar);
+    if (typeEncoding) {
+        _typeEncoding = [NSString stringWithUTF8String:typeEncoding];
+        _type = WXMFMDBEncodingGetType(typeEncoding);
+    }
+    return self;
+}
+
+@end
+
+@implementation WXMFMDBClassMethodInfo
+
+- (instancetype)initWithMethod:(Method)method {
+    if (!method) return nil;
+    self = [super init];
+    _method = method;
+    _sel = method_getName(method);
+    _imp = method_getImplementation(method);
+    const char *name = sel_getName(_sel);
+    if (name) {
+        _name = [NSString stringWithUTF8String:name];
+    }
+    const char *typeEncoding = method_getTypeEncoding(method);
+    if (typeEncoding) {
+        _typeEncoding = [NSString stringWithUTF8String:typeEncoding];
+    }
+    char *returnType = method_copyReturnType(method);
+    if (returnType) {
+        _returnTypeEncoding = [NSString stringWithUTF8String:returnType];
+        free(returnType);
+    }
+    unsigned int argumentCount = method_getNumberOfArguments(method);
+    if (argumentCount > 0) {
+        NSMutableArray *argumentTypes = [NSMutableArray new];
+        for (unsigned int i = 0; i < argumentCount; i++) {
+            char *argumentType = method_copyArgumentType(method, i);
+            NSString *type = argumentType ? [NSString stringWithUTF8String:argumentType] : nil;
+            [argumentTypes addObject:type ? type : @""];
+            if (argumentType) free(argumentType);
+        }
+        _argumentTypeEncodings = argumentTypes;
+    }
+    return self;
+}
+
+@end
+
+@implementation WXMFMDBClassPropertyInfo
+
+- (instancetype)initWithProperty:(objc_property_t)property {
+    if (!property) return nil;
+    self = [self init];
+    _property = property;
+    const char *name = property_getName(property);
+    if (name) {
+        _name = [NSString stringWithUTF8String:name];
+    }
+    
+    WXMFMDBEncodingType type = 0;
+    unsigned int attrCount;
+    objc_property_attribute_t *attrs = property_copyAttributeList(property, &attrCount);
+    for (unsigned int i = 0; i < attrCount; i++) {
+        switch (attrs[i].name[0]) {
+            case 'T': { // Type encoding
+                if (attrs[i].value) {
+                    _typeEncoding = [NSString stringWithUTF8String:attrs[i].value];
+                    type = WXMFMDBEncodingGetType(attrs[i].value);
+                    if ((type & WXMFMDBEncodingTypeMask) == WXMFMDBEncodingTypeObject) {
+                        size_t len = strlen(attrs[i].value);
+                        if (len > 3) {
+                            char name[len - 2];
+                            name[len - 3] = '\0';
+                            memcpy(name, attrs[i].value + 2, len - 3);
+                            _cls = objc_getClass(name);
+                        }
+                    }
+                }
+            } break;
+            case 'V': { // Instance variable
+                if (attrs[i].value) {
+                    _ivarName = [NSString stringWithUTF8String:attrs[i].value];
+                }
+            } break;
+            case 'R': {
+                type |= WXMFMDBEncodingTypePropertyReadonly;
+            } break;
+            case 'C': {
+                type |= WXMFMDBEncodingTypePropertyCopy;
+            } break;
+            case '&': {
+                type |= WXMFMDBEncodingTypePropertyRetain;
+            } break;
+            case 'N': {
+                type |= WXMFMDBEncodingTypePropertyNonatomic;
+            } break;
+            case 'D': {
+                type |= WXMFMDBEncodingTypePropertyDynamic;
+            } break;
+            case 'W': {
+                type |= WXMFMDBEncodingTypePropertyWeak;
+            } break;
+            case 'G': {
+                type |= WXMFMDBEncodingTypePropertyCustomGetter;
+                if (attrs[i].value) {
+                    _getter = NSSelectorFromString([NSString stringWithUTF8String:attrs[i].value]);
+                }
+            } break;
+            case 'S': {
+                type |= WXMFMDBEncodingTypePropertyCustomSetter;
+                if (attrs[i].value) {
+                    _setter = NSSelectorFromString([NSString stringWithUTF8String:attrs[i].value]);
+                }
+            } break;
+            default: break;
+        }
+    }
+    if (attrs) {
+        free(attrs);
+        attrs = NULL;
+    }
+    
+    _type = type;
+    if (_name.length) {
+        if (!_getter) {
+            _getter = NSSelectorFromString(_name);
+        }
+        if (!_setter) {
+            _setter = NSSelectorFromString([NSString stringWithFormat:@"set%@%@:", [_name substringToIndex:1].uppercaseString, [_name substringFromIndex:1]]);
+        }
+    }
+    return self;
+}
+
+@end
+
+@implementation WXMFMDBClassInfo {
+    BOOL _needUpdate;
+}
+
+- (instancetype)initWithClass:(Class)cls {
+    if (!cls) return nil;
+    self = [super init];
+    _cls = cls;
+    _superCls = class_getSuperclass(cls);
+    _isMeta = class_isMetaClass(cls);
+    if (!_isMeta) {
+        _metaCls = objc_getMetaClass(class_getName(cls));
+    }
+    _name = NSStringFromClass(cls);
+    [self _update];
+
+    _superClassInfo = [self.class classInfoWithClass:_superCls];
+    return self;
+}
+
+- (void)_update {
+    _ivarInfos = nil;
+    _methodInfos = nil;
+    _propertyInfos = nil;
+    
+    Class cls = self.cls;
+    unsigned int methodCount = 0;
+    Method *methods = class_copyMethodList(cls, &methodCount);
+    if (methods) {
+        NSMutableDictionary *methodInfos = [NSMutableDictionary new];
+        _methodInfos = methodInfos;
+        for (unsigned int i = 0; i < methodCount; i++) {
+            WXMFMDBClassMethodInfo *info = [[WXMFMDBClassMethodInfo alloc] initWithMethod:methods[i]];
+            if (info.name) methodInfos[info.name] = info;
+        }
+        free(methods);
+    }
+    unsigned int propertyCount = 0;
+    objc_property_t *properties = class_copyPropertyList(cls, &propertyCount);
+    if (properties) {
+        NSMutableDictionary *propertyInfos = [NSMutableDictionary new];
+        _propertyInfos = propertyInfos;
+        for (unsigned int i = 0; i < propertyCount; i++) {
+            WXMFMDBClassPropertyInfo *info = [[WXMFMDBClassPropertyInfo alloc] initWithProperty:properties[i]];
+            if (info.name) propertyInfos[info.name] = info;
+        }
+        free(properties);
+    }
+    
+    unsigned int ivarCount = 0;
+    Ivar *ivars = class_copyIvarList(cls, &ivarCount);
+    if (ivars) {
+        NSMutableDictionary *ivarInfos = [NSMutableDictionary new];
+        _ivarInfos = ivarInfos;
+        for (unsigned int i = 0; i < ivarCount; i++) {
+            WXMFMDBClassIvarInfo *info = [[WXMFMDBClassIvarInfo alloc] initWithIvar:ivars[i]];
+            if (info.name) ivarInfos[info.name] = info;
+        }
+        free(ivars);
+    }
+    
+    if (!_ivarInfos) _ivarInfos = @{};
+    if (!_methodInfos) _methodInfos = @{};
+    if (!_propertyInfos) _propertyInfos = @{};
+    
+    _needUpdate = NO;
+}
+
+- (void)setNeedUpdate {
+    _needUpdate = YES;
+}
+
+- (BOOL)needUpdate {
+    return _needUpdate;
+}
+
++ (instancetype)classInfoWithClass:(Class)cls {
+    if (!cls) return nil;
+    static CFMutableDictionaryRef classCache;
+    static CFMutableDictionaryRef metaCache;
+    static dispatch_once_t onceToken;
+    static dispatch_semaphore_t lock;
+    dispatch_once(&onceToken, ^{
+        classCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        metaCache = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        lock = dispatch_semaphore_create(1);
+    });
+    dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
+    WXMFMDBClassInfo *info = CFDictionaryGetValue(class_isMetaClass(cls) ? metaCache : classCache, (__bridge const void *)(cls));
+    if (info && info->_needUpdate) {
+        [info _update];
+    }
+    dispatch_semaphore_signal(lock);
+    if (!info) {
+        info = [[WXMFMDBClassInfo alloc] initWithClass:cls];
+        if (info) {
+            dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);
+            CFDictionarySetValue(info.isMeta ? metaCache : classCache, (__bridge const void *)(cls), (__bridge const void *)(info));
+            dispatch_semaphore_signal(lock);
+        }
+    }
+    return info;
+}
+
++ (instancetype)classInfoWithClassName:(NSString *)className {
+    Class cls = NSClassFromString(className);
+    return [self classInfoWithClass:cls];
+}
+
+@end
+
 
 
 @implementation NSObject (WXMFMDBModel)
@@ -1500,13 +1725,6 @@ static NSString *ModelDescription(NSObject *model) {
 }
 
 - (id)modelToJSONObject {
-    /*
-     Apple said:
-     The top level object is an NSArray or NSDictionary.
-     All objects are instances of NSString, NSNumber, NSArray, NSDictionary, or NSNull.
-     All dictionary keys are instances of NSString.
-     Numbers are not NaN or infinity.
-     */
     id jsonObject = ModelToJSONObjectRecursive(self);
     if ([jsonObject isKindOfClass:[NSArray class]]) return jsonObject;
     if ([jsonObject isKindOfClass:[NSDictionary class]]) return jsonObject;
@@ -1525,7 +1743,7 @@ static NSString *ModelDescription(NSObject *model) {
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
-- (id)modelCopy{
+- (id)modelCopy {
     if (self == (id)kCFNull) return self;
     _WXMFMDBModelMeta *modelMeta = [_WXMFMDBModelMeta metaWithClass:self.class];
     if (modelMeta->_nsType) return [self copy];
@@ -1571,7 +1789,7 @@ static NSString *ModelDescription(NSObject *model) {
                 case WXMFMDBEncodingTypeLongDouble: {
                     long double num = ((long double (*)(id, SEL))(void *) objc_msgSend)((id)self, propertyMeta->_getter);
                     ((void (*)(id, SEL, long double))(void *) objc_msgSend)((id)one, propertyMeta->_setter, num);
-                } // break; commented for code coverage in next line
+                }
                 default: break;
             }
         } else {
@@ -1596,7 +1814,7 @@ static NSString *ModelDescription(NSObject *model) {
                             [one setValue:value forKey:propertyMeta->_name];
                         }
                     } @catch (NSException *exception) {}
-                } // break; commented for code coverage in next line
+                }
                 default: break;
             }
         }
@@ -1783,36 +2001,3 @@ static NSString *ModelDescription(NSObject *model) {
 
 @end
 
-
-@implementation NSDictionary (WXMFMDBModel)
-
-+ (NSDictionary *)modelDictionaryWithClass:(Class)cls json:(id)json {
-    if (!json) return nil;
-    NSDictionary *dic = nil;
-    NSData *jsonData = nil;
-    if ([json isKindOfClass:[NSDictionary class]]) {
-        dic = json;
-    } else if ([json isKindOfClass:[NSString class]]) {
-        jsonData = [(NSString *)json dataUsingEncoding : NSUTF8StringEncoding];
-    } else if ([json isKindOfClass:[NSData class]]) {
-        jsonData = json;
-    }
-    if (jsonData) {
-        dic = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:NULL];
-        if (![dic isKindOfClass:[NSDictionary class]]) dic = nil;
-    }
-    return [self modelDictionaryWithClass:cls dictionary:dic];
-}
-
-+ (NSDictionary *)modelDictionaryWithClass:(Class)cls dictionary:(NSDictionary *)dic {
-    if (!cls || !dic) return nil;
-    NSMutableDictionary *result = [NSMutableDictionary new];
-    for (NSString *key in dic.allKeys) {
-        if (![key isKindOfClass:[NSString class]]) continue;
-        NSObject *obj = [cls modelWithDictionary:dic[key]];
-        if (obj) result[key] = obj;
-    }
-    return result;
-}
-
-@end

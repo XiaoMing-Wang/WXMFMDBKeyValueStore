@@ -1,5 +1,5 @@
 //
-//  WXMObserverObject.m
+//  WXMFMDBObserverObject.m
 //  ModuleDebugging
 //
 //  Created by edz on 2019/6/28.
