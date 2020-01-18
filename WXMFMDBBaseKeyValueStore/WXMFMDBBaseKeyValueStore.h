@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** 存储对象 */
+/** 存储到sql里的对象 */
 @interface WXMKeyValueItem : NSObject
 @property (strong, nonatomic) NSString *itemId;
 @property (strong, nonatomic) id itemObject;

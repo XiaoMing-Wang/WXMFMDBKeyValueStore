@@ -18,16 +18,18 @@ NS_ASSUME_NONNULL_BEGIN
 /** 设置userID 所有的表都使用userID作为key */
 + (void)setUserID:(NSString *)userID;
 
-/** 存取model 以Class作为表名不区分大小写 */
-+ (void)saveCustomModelWithObject:(NSObject *)object;
-+ (NSObject *)getCustomModelWithClass:(Class)aClass;
-
 /** 存取json (NSString, NSArray,NSDictionary) */
-+ (void)saveAssembleWithAssemble:(id)object fromTable:(NSString *)tableName;
++ (void)saveAssembleWithAssemble:(id<NSCopying>)object fromTable:(NSString *)tableName;
+
+/** 获取json (NSString, NSArray,NSDictionary)  */
 + (id<NSCopying, NSMutableCopying>)getAssembleWithTable:(NSString *)tableName;
 
+/** 删除缓存 */
++ (void)deleteObjectFromTable:(NSString *)tableName;
+
 /** 删除列表 */
-- (void)clearCustomTable:(NSString *)tableName;
++ (void)clearCustomTable:(NSString *)tableName;
+
 @end
 
 NS_ASSUME_NONNULL_END
