@@ -5,28 +5,16 @@
 //  Created by edz on 2019/6/26.
 //  Copyright © 2019 wq. All rights reserved.
 //
-#ifdef DEBUG
-#define debugLog(...)    NSLog(__VA_ARGS__)
-#define debugMethod()    NSLog(@"%s", __func__)
-#define debugError()     NSLog(@"Error at %s Line:%d", __func__, __LINE__)
-#else
-#define debugLog(...)
-#define debugMethod()
-#define debugError()
-#endif
-
-#define KLibraryboxPath \
-NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject
-#define PATH_OF_DOCUMENT [KLibraryboxPath stringByAppendingPathComponent:@"USERDATABASE"]
 
 #import "WXMFMDBBaseKeyValueStore.h"
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 #import "FMDatabaseQueue.h"
+#import "WXMFMDBConfiguration.h"
 
 @implementation WXMKeyValueItem @end
-@interface WXMFMDBBaseKeyValueStore()
-@property (strong, nonatomic) FMDatabaseQueue * dbQueue;
+@interface WXMFMDBBaseKeyValueStore ()
+@property (strong, nonatomic) FMDatabaseQueue *dbQueue;
 @end
 
 @implementation WXMFMDBBaseKeyValueStore
@@ -38,9 +26,8 @@ json TEXT NOT NULL, \
 createdTime TEXT NOT NULL, \
 PRIMARY KEY(id)) ";
 
-static NSString *const UPDATE_ITEM_SQL =
-@"REPLACE INTO %@ (id, json, createdTime) values (?, ?, ?)";
-
+/** sql语句 */
+static NSString *const UPDATE_ITEM_SQL = @"REPLACE INTO %@ (id, json, createdTime) values (?, ?, ?)";
 static NSString *const QUERY_ITEM_SQL = @"SELECT json, createdTime from %@ where id = ? Limit 1";
 static NSString *const SELECT_ALL_SQL = @"SELECT * from %@";
 static NSString *const COUNT_ALL_SQL = @"SELECT count(*) as num from %@";
@@ -51,45 +38,49 @@ static NSString *const DELETE_ITEMS_WITH_PREFIX_SQL = @"DELETE from %@ where id 
 static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 /** 存储NSArray NSDictionary NSString */
-- (void)saveAssembleWithAssemble:(id<NSCoding,NSObject,NSMutableCopying>)object
-                      primaryKey:(NSString *)primaryKey
-                       fromTable:(NSString *)tableName {
-    
+- (void)saveAssembleWithAssemble:(id<NSCoding,NSObject>)object primaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName {
     tableName = [NSString stringWithFormat:PrefixFormat,tableName.uppercaseString];
     if ([self checkTableName:tableName] == NO) return;
-    if ([object isKindOfClass:[NSArray class]] ||
-        [object isKindOfClass:[NSDictionary class]] ) {
+    
+    if ([object isKindOfClass:[NSArray class]] || [object isKindOfClass:[NSDictionary class]] ) {
+        
         [self putObject:object withId:primaryKey intoTable:tableName];
+        
     } else if ([object isKindOfClass:[NSString class]]) {
-        NSString *aString = (NSString *) object;
+        
+        NSString *aString = (NSString *)object;
         [self putString:aString withId:primaryKey intoTable:tableName];
+        
     } else if ([object isKindOfClass:[NSNumber class]]) {
+        
         NSNumber *aNumber = (NSNumber *) object;
         [self putNumber:aNumber withId:primaryKey intoTable:tableName];
+        
     } else if ([object isKindOfClass:[NSObject class]]) {
+        
         debugLog(@"ERROR, object class is NSObject");
     }
 }
 
 - (id)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName {
+    
     tableName = [NSString stringWithFormat:PrefixFormat,tableName.uppercaseString];
     if ([self checkTableName:tableName] == NO) return nil;
     WXMKeyValueItem *item = [self getWXMKeyValueItem:primaryKey fromTable:tableName];
     return item.itemObject ?: nil;
+    
 }
 
 /************************ 数据库操作 *****************************************/
 
 + (void)load {
-    NSFileManager* manager = [NSFileManager defaultManager];
-    NSString *cache = PATH_OF_DOCUMENT;
     BOOL isDir = NO;
-    BOOL isExists = [manager fileExistsAtPath:cache isDirectory:&isDir];
+    BOOL isExists = [kFileManager fileExistsAtPath:kTargetPath isDirectory:&isDir];
     if (!isExists || !isDir) {
-        [manager createDirectoryAtPath:cache
-           withIntermediateDirectories:YES
-                            attributes:nil
-                                 error:nil];
+        [kFileManager createDirectoryAtPath:kTargetPath
+                withIntermediateDirectories:YES
+                                 attributes:nil
+                                      error:nil];
     }
 }
 
@@ -99,7 +90,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 - (id)initDBWithName:(NSString *)dbName {
     if (self = [super init]) {
-        NSString *dbPath = [PATH_OF_DOCUMENT stringByAppendingPathComponent:dbName];
+        NSString *dbPath = [kTargetPath stringByAppendingPathComponent:dbName];
         if (_dbQueue) [self close];
         _dbQueue = [FMDatabaseQueue databaseQueueWithPath:dbPath];
         debugLog(@"dbPath = %@", dbPath);
@@ -109,9 +100,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 /** 校验tableName合法性和创建表单 */
 - (BOOL)checkTableName:(NSString *)tableName {
-    if (tableName == nil ||
-        tableName.length == 0 ||
-        [tableName rangeOfString:@" "].location != NSNotFound) {
+    if (tableName == nil || tableName.length == 0 || [tableName rangeOfString:@" "].location != NSNotFound) {
         debugLog(@"ERROR, table name: %@ format error.", tableName);
         return NO;
     }
@@ -249,7 +238,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 - (NSString *)getStringById:(NSString *)stringId fromTable:(NSString *)tableName {
     NSArray *array = [self getWXMKeyValueItem:stringId fromTable:tableName].itemObject;
-    if (array && [array isKindOfClass:[NSArray class]]) return array[0];
+    if (array && [array isKindOfClass:[NSArray class]]) return array.firstObject;
     return nil;
 }
 
@@ -264,14 +253,14 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 - (NSNumber *)getNumberById:(NSString *)numberId fromTable:(NSString *)tableName {
     NSArray *array = [self getWXMKeyValueItem:numberId fromTable:tableName].itemObject;
-    if (array && [array isKindOfClass:[NSArray class]]) return array[0];
+    if (array && [array isKindOfClass:[NSArray class]]) return array.firstObject;
     return nil;
 }
 
 /** 获取所有表所有的数据 */
 - (NSArray <id>*)getAllItemsFromTable:(NSString *)tableName {
+    
     if ([self checkTableName:tableName] == NO) return nil;
-   
     NSString * sql = [NSString stringWithFormat:SELECT_ALL_SQL, tableName];
     __block NSMutableArray *result = [NSMutableArray array];
     [_dbQueue inDatabase:^(FMDatabase *db) {
@@ -282,7 +271,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
             id object = [rs stringForColumn:@"json"];
             item.itemObject = [NSJSONSerialization JSONObjectWithData:[object dataUsingEncoding:NSUTF8StringEncoding] options:(NSJSONReadingAllowFragments) error:nil];
             item.createdTime = [rs dateForColumn:@"createdTime"];
-            if(item.itemObject) [result addObject:item.itemObject];
+            if (item.itemObject) [result addObject:item.itemObject];
         }
         [rs close];
     }];
