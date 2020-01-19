@@ -21,9 +21,12 @@ NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).f
 #define kFilePath \
 [kLibraryboxPath stringByAppendingPathComponent:@"FILE_CACHE"]
 
-/** file->视频文件夹 */
+/** file->数据库文件夹 */
 #define kTargetPath \
 [kFilePath stringByAppendingPathComponent:@"WXMDataBase"]
+
+/** 表名 */
+#define PrefixFormat @"WXMFORM_%@_LIST"
 
 #ifdef DEBUG
 #define debugLog(...)    NSLog(__VA_ARGS__)

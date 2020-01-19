@@ -64,7 +64,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 - (id)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName {
     
-    tableName = [NSString stringWithFormat:PrefixFormat,tableName.uppercaseString];
+    tableName = [NSString stringWithFormat:PrefixFormat, tableName.uppercaseString];
     if ([self checkTableName:tableName] == NO) return nil;
     WXMKeyValueItem *item = [self getWXMKeyValueItem:primaryKey fromTable:tableName];
     return item.itemObject ?: nil;
