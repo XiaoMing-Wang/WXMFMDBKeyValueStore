@@ -56,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** model属性 */
 - (NSString *)modelDescription;
+
 @end
 
 @interface NSArray (WXMFMDBModel)

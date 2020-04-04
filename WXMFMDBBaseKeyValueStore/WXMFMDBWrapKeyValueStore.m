@@ -37,27 +37,25 @@
 
 + (void)saveAssembleWithAssemble:(id)object fromTable:(NSString *)tableName {
     NSAssert([self judgeExsitUserID], @"请设置userID");
-    if ([self judgeExsitUserID]) return;
-    [self.sharedInstance saveAssembleWithAssemble:object
-                                       primaryKey:self.userID
-                                        fromTable:tableName];
+    if (![self judgeExsitUserID]) return;
+    [self.sharedInstance saveAssembleWithAssemble:object primaryKey:self.userID fromTable:tableName];
 }
 
 + (id)getAssembleWithTable:(NSString *)tableName {
     NSAssert([self judgeExsitUserID], @"请设置userID");
-    if ([self judgeExsitUserID]) return nil;
+    if (![self judgeExsitUserID]) return nil;
     return [[self sharedInstance] getAssembleWithPrimaryKey:self.userID fromTable:tableName];
 }
 
 + (void)deleteObjectFromTable:(NSString *)tableName {
     NSAssert([self judgeExsitUserID], @"请设置userID");
-    if ([self judgeExsitUserID]) return;
+    if (![self judgeExsitUserID]) return;
     [[self.class sharedInstance] deleteObject:self.userID fromTable:tableName];
 }
 
 + (void)clearCustomTable:(NSString *)tableName {
     NSAssert([self judgeExsitUserID], @"请设置userID");
-    if ([self judgeExsitUserID]) return;
+    if (![self judgeExsitUserID]) return;
     [[self.class sharedInstance] clearTable:tableName];
 }
 @end

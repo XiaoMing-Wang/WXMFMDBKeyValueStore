@@ -1,14 +1,14 @@
 //
-//  WXMFMDBManagerConfiguration.h
-//  ModuleDebugging
+//  WXMFMDBTableHeader.h
+//  WXMComponentization
 //
-//  Created by edz on 2019/9/4.
-//  Copyright © 2019 wq. All rights reserved.
+//  Created by wxm on 2020/1/19.
+//  Copyright © 2020 wxm. All rights reserved.
 //
 
+#ifndef WXMFMDBTableHeader_h
+#define WXMFMDBTableHeader_h
 #import <Foundation/Foundation.h>
-#ifndef WXMFMDBManagerConfiguration_h
-#define WXMFMDBManagerConfiguration_h
 
 typedef NSString *WXMFMDBTableType NS_STRING_ENUM;
 
@@ -25,4 +25,4 @@ static WXMFMDBTableType const USER_BILL = @"USER_BILL";
 
 /******************************** json表名 ********************************/
 
-#endif /* WXMFMDBManagerConfiguration_h */
+#endif /* WXMFMDBTableHeader_h */

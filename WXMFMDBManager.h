@@ -5,6 +5,7 @@
 //  Created by edz on 2019/6/27.
 //  Copyright © 2019 wq. All rights reserved.
 //
+#import "WXMFMDBTableHeader.h"
 #import "WXMFMDBConfiguration.h"
 #import "WXMFMDBWrapKeyValueStore.h"
 NS_ASSUME_NONNULL_BEGIN
@@ -20,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)wf_saveModelWithObject:(id)object;
 + (id)wf_getModelWithClass:(Class)aClass;
 
-/** 数组 */
+/** 对象数组 */
 + (void)wf_saveModelArraysWithObjects:(NSArray *)objects;
 + (NSArray *)wf_getModelArraysWithClass:(Class)aClass;
 

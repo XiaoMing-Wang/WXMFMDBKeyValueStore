@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)saveAssembleWithAssemble:(id<NSCopying>)object fromTable:(NSString *)tableName;
 
 /** 获取json (NSString, NSArray,NSDictionary)  */
-+ (id<NSCopying, NSMutableCopying>)getAssembleWithTable:(NSString *)tableName;
++ (id<NSCopying>)getAssembleWithTable:(NSString *)tableName;
 
 /** 删除缓存 */
 + (void)deleteObjectFromTable:(NSString *)tableName;
