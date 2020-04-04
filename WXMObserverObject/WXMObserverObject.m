@@ -23,25 +23,23 @@
 /** 监听所有属性 */
 - (void)listeningAllProperty {
     [self removeAllProperty];
-    [self.attributeArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
-        if (obj.length <= 0) return;
-        @try {
-            [self addObserver:self
-                   forKeyPath:obj
-                      options:NSKeyValueObservingOptionNew
-                      context:nil];
-        } @catch (NSException *exception) {} @finally {}
-    }];
+    for (NSString *key in self.attributeArray) {
+        if (key.length == 0) return;
+        [self addObserver:self
+               forKeyPath:key
+                  options:NSKeyValueObservingOptionNew
+                  context:nil];
+    }
 }
 
 /** 删除所有属性监听 */
 - (void)removeAllProperty {
     if (!self.attributeArray || self.attributeArray.count == 0) return;
-    [self.attributeArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
+    for (NSString *key in self.attributeArray) {
         @try {
-            if (obj.length > 0) [self removeObserver:self forKeyPath:obj];
+            if (key) [self removeObserver:self forKeyPath:key];
         } @catch (NSException *exception) {} @finally {}
-    }];
+    }
 }
 
 /** 属性变换 */
@@ -49,7 +47,9 @@
                       ofObject:(id)object
                         change:(NSDictionary *)change
                        context:(void *)context {
-    if ([self.attributeArray containsObject:keyPath]) [self wf_parametersChange];
+    if ([self.attributeArray containsObject:keyPath]) {
+        [self wf_parametersChange];
+    }
 }
 
 /** 参数变化调用 */
@@ -59,18 +59,16 @@
 
 /** 获取所有属性 */
 + (NSArray *)wf_getFropertys {
-    @try {
-        unsigned int count = 0;
-        NSMutableArray *_arrayM = @[].mutableCopy;
-        objc_property_t *propertys = class_copyPropertyList([self class], &count);
-        for (int i = 0; i < count; i++) {
-            objc_property_t property = propertys[i];
-            NSString *pro = [NSString stringWithCString:property_getName(property)
-                                               encoding:NSUTF8StringEncoding];
-            [_arrayM addObject:pro];
-        }
-        return _arrayM;
-    } @catch (NSException *exception) {} @finally {}
+    unsigned int count = 0;
+    NSMutableArray *_arrayM = @[].mutableCopy;
+    objc_property_t *propertys = class_copyPropertyList([self class], &count);
+    for (int i = 0; i < count; i++) {
+        objc_property_t property = propertys[i];
+        NSString *pro = [NSString stringWithCString:property_getName(property)
+                                           encoding:NSUTF8StringEncoding];
+        [_arrayM addObject:pro];
+    }
+    return _arrayM;
 }
 
 - (NSMutableArray<NSString *> *)attributeArray {

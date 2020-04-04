@@ -17,7 +17,12 @@
 
 #define KLibraryboxPath \
 NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject
-#define PATH_OF_DOCUMENT [KLibraryboxPath stringByAppendingPathComponent:@"USERDATABASE"]
+
+#define kCachePath \
+[KLibraryboxPath stringByAppendingPathComponent:@"WXMCACHE"]
+
+#define kTargetPath \
+[kCachePath stringByAppendingPathComponent:@"FMDBModule"]
 
 #import "WXMFMDBBaseKeyValueStore.h"
 #import "FMDatabase.h"
@@ -82,7 +87,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 + (void)load {
     NSFileManager* manager = [NSFileManager defaultManager];
-    NSString *cache = PATH_OF_DOCUMENT;
+    NSString *cache = kTargetPath;
     BOOL isDir = NO;
     BOOL isExists = [manager fileExistsAtPath:cache isDirectory:&isDir];
     if (!isExists || !isDir) {
@@ -99,7 +104,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 - (id)initDBWithName:(NSString *)dbName {
     if (self = [super init]) {
-        NSString *dbPath = [PATH_OF_DOCUMENT stringByAppendingPathComponent:dbName];
+        NSString *dbPath = [kTargetPath stringByAppendingPathComponent:dbName];
         if (_dbQueue) [self close];
         _dbQueue = [FMDatabaseQueue databaseQueueWithPath:dbPath];
         debugLog(@"dbPath = %@", dbPath);

@@ -6,7 +6,7 @@
 //  Copyright © 2019 wq. All rights reserved.
 //
 
-/** 监听属性变化的object 适用与自定义model 更新属性时需要同步缓存 */
+/** 监听属性变化的object  */
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
