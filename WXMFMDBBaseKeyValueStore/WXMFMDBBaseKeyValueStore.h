@@ -27,7 +27,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)close;
 
 /** 存储NSArray NSDictionary NSString NSNumber */
-- (void)saveAssembleWithAssemble:(id<NSCopying>)object primaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName;
+- (void)saveAssembleWithAssemble:(id<NSCopying>)object
+                      primaryKey:(NSString *)primaryKey
+                       fromTable:(NSString *)tableName;
+
 
 /** 获取NSArray NSDictionary NSString NSNumber */
 - (id<NSCopying>)getAssembleWithPrimaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName;

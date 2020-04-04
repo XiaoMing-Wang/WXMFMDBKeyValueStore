@@ -56,7 +56,10 @@ static NSString *const DELETE_ITEMS_WITH_PREFIX_SQL = @"DELETE from %@ where id 
 static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
 
 /** 存储NSArray NSDictionary NSString */
-- (void)saveAssembleWithAssemble:(id<NSCoding,NSObject>)object primaryKey:(NSString *)primaryKey fromTable:(NSString *)tableName {
+- (void)saveAssembleWithAssemble:(id<NSCoding,NSObject>)object
+                      primaryKey:(NSString *)primaryKey
+                       fromTable:(NSString *)tableName {
+    
     tableName = [NSString stringWithFormat:PrefixFormat,tableName.uppercaseString];
     if ([self checkTableName:tableName] == NO) return;
     
@@ -84,6 +87,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     
     tableName = [NSString stringWithFormat:PrefixFormat, tableName.uppercaseString];
     if ([self checkTableName:tableName] == NO) return nil;
+    
     WXMKeyValueItem *item = [self getWXMKeyValueItem:primaryKey fromTable:tableName];
     return item.itemObject ?: nil;
     
@@ -199,6 +203,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     NSString *jsonString = [[NSString alloc] initWithData:data encoding:(NSUTF8StringEncoding)];
     NSDate *createdTime = [NSDate date];
     NSString *sql = [NSString stringWithFormat:UPDATE_ITEM_SQL, tableName];
+    
     __block BOOL result;
     [_dbQueue inDatabase:^(FMDatabase *db) {
         result = [db executeUpdate:sql, objectId, jsonString, createdTime];
@@ -216,6 +221,7 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
     NSString * sql = [NSString stringWithFormat:QUERY_ITEM_SQL, tableName];
     __block NSString * json = nil;
     __block NSDate * createdTime = nil;
+    
     [_dbQueue inDatabase:^(FMDatabase *db) {
         FMResultSet * rs = [db executeQuery:sql, primaryKey];
         if ([rs next]) {
@@ -231,18 +237,20 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
                      JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
                      options:(NSJSONReadingAllowFragments)
                      error:&error];
+        
         if (error) {
             debugLog(@"ERROR, faild to prase to json");
             return nil;
         }
+        
         WXMKeyValueItem * item = [[WXMKeyValueItem alloc] init];
         item.itemId = primaryKey;
         item.itemObject = result;
         item.createdTime = createdTime;
         return item;
     }
-    return nil;
     
+    return nil;
 }
 
 /** NSString */
@@ -251,13 +259,11 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
         debugLog(@"error, string is nil");
         return;
     }
-    [self putObject:@[string] withId:stringId intoTable:tableName];
+    [self putObject:string withId:stringId intoTable:tableName];
 }
 
 - (NSString *)getStringById:(NSString *)stringId fromTable:(NSString *)tableName {
-    NSArray *array = [self getWXMKeyValueItem:stringId fromTable:tableName].itemObject;
-    if (array && [array isKindOfClass:[NSArray class]]) return array.firstObject;
-    return nil;
+    return (NSString *) [self getWXMKeyValueItem:stringId fromTable:tableName].itemObject;
 }
 
 /** NSNumber */
@@ -266,13 +272,11 @@ static NSString *const DROP_TABLE_SQL = @" DROP TABLE '%@' ";
         debugLog(@"error, number is nil");
         return;
     }
-    [self putObject:@[number] withId:numberId intoTable:tableName];
+    [self putObject:number withId:numberId intoTable:tableName];
 }
 
 - (NSNumber *)getNumberById:(NSString *)numberId fromTable:(NSString *)tableName {
-    NSArray *array = [self getWXMKeyValueItem:numberId fromTable:tableName].itemObject;
-    if (array && [array isKindOfClass:[NSArray class]]) return array.firstObject;
-    return nil;
+    return (NSNumber *) [self getWXMKeyValueItem:numberId fromTable:tableName].itemObject;
 }
 
 /** 获取所有表所有的数据 */
