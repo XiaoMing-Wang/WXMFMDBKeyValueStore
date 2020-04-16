@@ -6,7 +6,6 @@
 //  Copyright © 2019 wq. All rights reserved.
 //
 #import "WXMFMDBTableHeader.h"
-#import "WXMFMDBConfiguration.h"
 #import "WXMFMDBWrapKeyValueStore.h"
 NS_ASSUME_NONNULL_BEGIN
 

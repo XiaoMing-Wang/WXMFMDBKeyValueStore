@@ -5,25 +5,6 @@
 //  Created by edz on 2019/6/26.
 //  Copyright © 2019 wq. All rights reserved.
 //
-#ifdef DEBUG
-#define debugLog(...)    NSLog(__VA_ARGS__)
-#define debugMethod()    NSLog(@"%s", __func__)
-#define debugError()     NSLog(@"Error at %s Line:%d", __func__, __LINE__)
-#else
-#define debugLog(...)
-#define debugMethod()
-#define debugError()
-#endif
-
-#define KLibraryboxPath \
-NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES).firstObject
-
-#define kCachePath \
-[KLibraryboxPath stringByAppendingPathComponent:@"WXMCACHE"]
-
-#define kTargetPath \
-[kCachePath stringByAppendingPathComponent:@"FMDBModule"]
-
 #import "WXMFMDBBaseKeyValueStore.h"
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
