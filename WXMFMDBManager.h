@@ -16,15 +16,15 @@ NS_ASSUME_NONNULL_BEGIN
 /** 需要调用改方法设置userID 数据库所有的表都使用userid作为key */
 + (void)wf_setUserID:(NSString *)userID;
 
-/** 对象 */
+/** 存取对象 */
 + (void)wf_saveModelWithObject:(id)object;
 + (id)wf_getModelWithClass:(Class)aClass;
 
-/** 对象数组 */
+/** 存取对象数组 */
 + (void)wf_saveModelArraysWithObjects:(NSArray *)objects;
 + (NSArray *)wf_getModelArraysWithClass:(Class)aClass;
 
-/** json */
+/** 存取json */
 + (void)wf_saveAssembleWithObject:(id)object instanceType:(WXMFMDBTableType)instanceType;
 + (id)wf_getAssembleWithInstanceType:(WXMFMDBTableType)instanceType;
 
